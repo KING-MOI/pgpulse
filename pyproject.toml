@@ -1,0 +1,16 @@
+[build-system]
+requires = ["hatchling"]
+build-backend = "hatchling.build"
+
+[project]
+name = "pgpulse"
+version = "0.1.0.dev0"
+description = "Health-check CLI for Postgres"
+readme = "README.md"
+license = "MIT"
+authors = [{ name = "Aditya Verma" }]
+requires-python = ">=3.11"
+dependencies = []
+
+[tool.hatch.build.targets.wheel]
+packages = ["src/pgpulse"]
