@@ -66,3 +66,4 @@
 - follow up on the retry path
 - follow up on cleanup logic
 - follow up on type narrowing
+- considered type narrowing; parked for now
