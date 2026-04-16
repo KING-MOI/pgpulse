@@ -54,3 +54,4 @@
 - follow up on config defaults
 - considered ci caching; parked for now
 - double-check docs example behavior
+- follow up on config defaults
