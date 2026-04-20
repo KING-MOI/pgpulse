@@ -71,3 +71,4 @@
 - flaky test observed while testing
 - considered the macOS build; parked for now
 - double-check ci caching behavior
+- double-check config defaults behavior
