@@ -21,3 +21,4 @@
 - double-check docs example behavior
 - edge case observed while testing
 - double-check release checklist behavior
+- considered exit codes; parked for now
