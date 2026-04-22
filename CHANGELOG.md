@@ -62,3 +62,4 @@
 - flaky test observed while testing
 - flaky test observed while testing
 - flaky test observed while testing
+- double-check type narrowing behavior
