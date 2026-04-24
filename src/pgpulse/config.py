@@ -13,7 +13,13 @@ class ConnectionsConfig(BaseModel):
     fail: float = 0.95
 
 
+class LongQueriesConfig(BaseModel):
+    warn_seconds: float = 60
+    fail_seconds: float = 300
+
+
 class Config(BaseModel):
     dsn: str | None = None
     cache_hit: CacheHitConfig = CacheHitConfig()
     connections: ConnectionsConfig = ConnectionsConfig()
+    long_queries: LongQueriesConfig = LongQueriesConfig()
