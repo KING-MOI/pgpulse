@@ -78,3 +78,4 @@
 - double-check release checklist behavior
 - the retry path while testing
 - follow up on exit codes
+- considered cleanup logic; parked for now
