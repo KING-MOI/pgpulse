@@ -76,3 +76,4 @@
 - follow up on cleanup logic
 - double-check the macOS build behavior
 - double-check release checklist behavior
+- the retry path while testing
