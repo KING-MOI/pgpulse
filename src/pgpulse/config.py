@@ -18,8 +18,13 @@ class LongQueriesConfig(BaseModel):
     fail_seconds: float = 300
 
 
+class UnusedIndexesConfig(BaseModel):
+    min_size_bytes: int = 1024 * 1024
+
+
 class Config(BaseModel):
     dsn: str | None = None
     cache_hit: CacheHitConfig = CacheHitConfig()
     connections: ConnectionsConfig = ConnectionsConfig()
     long_queries: LongQueriesConfig = LongQueriesConfig()
+    unused_indexes: UnusedIndexesConfig = UnusedIndexesConfig()
