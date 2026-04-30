@@ -11,3 +11,4 @@
 - double-check cleanup logic behavior
 - double-check docs example behavior
 - follow up on error messages
+- considered exit codes; parked for now
