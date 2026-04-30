@@ -22,3 +22,4 @@
 - edge case observed while testing
 - double-check release checklist behavior
 - considered exit codes; parked for now
+- follow up on release checklist
