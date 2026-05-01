@@ -73,3 +73,4 @@
 - double-check ci caching behavior
 - double-check config defaults behavior
 - flaky test observed while testing
+- follow up on cleanup logic
