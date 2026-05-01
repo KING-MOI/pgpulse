@@ -24,3 +24,9 @@ def test_low_ratio_fails():
 
 def test_summary_shows_percentage():
     assert "99.90%" in run(9990.0, 10.0).summary
+
+
+def test_empty_stats_do_not_divide_by_zero():
+    result = run(None, None)
+    assert result.status is Status.OK
+    assert "no table reads" in result.summary
