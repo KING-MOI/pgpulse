@@ -17,3 +17,6 @@ def check(name: str) -> Callable[[CheckFn], CheckFn]:
         return fn
 
     return register
+
+
+from pgpulse.checks import bloat, cache, connections, indexes, queries  # noqa: E402, F401
