@@ -25,3 +25,4 @@
 - follow up on release checklist
 - double-check config defaults behavior
 - follow up on ci caching
+- slow start observed while testing
