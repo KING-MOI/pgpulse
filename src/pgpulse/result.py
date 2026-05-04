@@ -8,6 +8,7 @@ class Status(IntEnum):
     OK = 0
     WARN = 1
     FAIL = 2
+    ERROR = 3
 
 
 @dataclass
