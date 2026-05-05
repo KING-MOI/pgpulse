@@ -26,3 +26,4 @@
 - double-check config defaults behavior
 - follow up on ci caching
 - slow start observed while testing
+- considered release checklist; parked for now
