@@ -32,3 +32,6 @@ target-version = "py311"
 
 [tool.ruff.lint]
 select = ["E", "F", "I", "B", "UP"]
+
+[project.scripts]
+pgpulse = "pgpulse.cli:main"
