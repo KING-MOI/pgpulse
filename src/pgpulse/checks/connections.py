@@ -9,6 +9,7 @@ CONNECTIONS_SQL = """
 SELECT count(*) AS used,
        current_setting('max_connections')::int AS max
 FROM pg_stat_activity
+WHERE backend_type = 'client backend'
 """
 
 
