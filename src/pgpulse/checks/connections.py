@@ -7,7 +7,8 @@ from pgpulse.result import CheckResult, Status
 
 CONNECTIONS_SQL = """
 SELECT count(*) AS used,
-       current_setting('max_connections')::int AS max
+       current_setting('max_connections')::int
+         - current_setting('superuser_reserved_connections')::int AS max
 FROM pg_stat_activity
 WHERE backend_type = 'client backend'
 """
