@@ -6,6 +6,7 @@ from collections.abc import Callable
 
 from rich.console import Console
 
+from pgpulse.checks import REGISTRY
 from pgpulse.config import Config
 from pgpulse.db import Connection, PsycopgConnection
 from pgpulse.report import render
@@ -16,6 +17,9 @@ from pgpulse.runner import run_checks
 def build_parser() -> argparse.ArgumentParser:
     parser = argparse.ArgumentParser(prog="pgpulse", description="Health checks for Postgres.")
     parser.add_argument("--dsn", default="", help="libpq connection string or URI")
+    parser.add_argument(
+        "-c", "--check", action="append", choices=sorted(REGISTRY), help="run only this check (repeatable)"
+    )
     return parser
 
 
@@ -29,7 +33,7 @@ def main(argv: list[str] | None = None, connect: Callable[[str], Connection] = P
         Console(stderr=True).print(f"[bold red]cannot connect:[/] {exc}")
         return 3
     try:
-        results = run_checks(conn, cfg)
+        results = run_checks(conn, cfg, args.check)
     finally:
         conn.close()
     render(results, console)

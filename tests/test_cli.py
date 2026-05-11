@@ -41,3 +41,11 @@ def test_connection_failure_exits_three(capsys):
 
     assert main([], connect=refuse) == 3
     assert "connection refused" in capsys.readouterr().err
+
+
+def test_check_flag_limits_checks(capsys):
+    connect = connector(healthy())
+    main(["--check", "cache_hit"], connect=connect)
+    out = capsys.readouterr().out
+    assert "cache_hit" in out
+    assert "bloat" not in out
