@@ -18,3 +18,4 @@
 - double-check docs example behavior
 - follow up on link checker
 - follow up on release checklist
+- double-check docs example behavior
