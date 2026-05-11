@@ -22,12 +22,17 @@ def build_parser() -> argparse.ArgumentParser:
 def main(argv: list[str] | None = None, connect: Callable[[str], Connection] = PsycopgConnection) -> int:
     args = build_parser().parse_args(argv)
     cfg = Config(dsn=args.dsn)
-    conn = connect(cfg.dsn or "")
+    console = Console()
+    try:
+        conn = connect(cfg.dsn or "")
+    except ConnectionError as exc:
+        console.print(f"[bold red]cannot connect:[/] {exc}")
+        return 3
     try:
         results = run_checks(conn, cfg)
     finally:
         conn.close()
-    render(results, Console())
+    render(results, console)
     worst = max((r.status for r in results), default=Status.OK)
     return 1 if worst >= Status.FAIL else 0
 

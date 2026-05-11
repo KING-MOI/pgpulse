@@ -33,3 +33,11 @@ def test_connection_is_closed_and_gets_dsn():
     main(["--dsn", "postgresql://localhost/app"], connect=connect)
     assert connect.conns[0].closed
     assert connect.conns[0].dsn == "postgresql://localhost/app"
+
+
+def test_connection_failure_exits_three(capsys):
+    def refuse(dsn):
+        raise ConnectionError("connection refused")
+
+    assert main([], connect=refuse) == 3
+    assert "connection refused" in capsys.readouterr().out

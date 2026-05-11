@@ -14,7 +14,10 @@ class PsycopgConnection:
         import psycopg
         from psycopg.rows import dict_row
 
-        self._conn = psycopg.connect(dsn, row_factory=dict_row, autocommit=True)
+        try:
+            self._conn = psycopg.connect(dsn, row_factory=dict_row, autocommit=True)
+        except psycopg.OperationalError as exc:
+            raise ConnectionError(str(exc).strip()) from exc
 
     def fetchall(self, sql: str, params: tuple[Any, ...] | None = None) -> list[dict[str, Any]]:
         with self._conn.cursor() as cur:
