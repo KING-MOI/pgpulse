@@ -26,7 +26,7 @@ def main(argv: list[str] | None = None, connect: Callable[[str], Connection] = P
     try:
         conn = connect(cfg.dsn or "")
     except ConnectionError as exc:
-        console.print(f"[bold red]cannot connect:[/] {exc}")
+        Console(stderr=True).print(f"[bold red]cannot connect:[/] {exc}")
         return 3
     try:
         results = run_checks(conn, cfg)

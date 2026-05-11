@@ -40,4 +40,4 @@ def test_connection_failure_exits_three(capsys):
         raise ConnectionError("connection refused")
 
     assert main([], connect=refuse) == 3
-    assert "connection refused" in capsys.readouterr().out
+    assert "connection refused" in capsys.readouterr().err
