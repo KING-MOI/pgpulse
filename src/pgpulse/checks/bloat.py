@@ -13,6 +13,7 @@ FROM pg_stat_user_tables
 
 @check("bloat")
 def table_bloat(conn: Connection, cfg: Config) -> CheckResult:
+    """Tables with a high share of dead tuples."""
     limits = cfg.bloat
     status = Status.OK
     details = []

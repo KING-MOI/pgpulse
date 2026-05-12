@@ -16,6 +16,7 @@ ORDER BY query_start
 
 @check("long_queries")
 def long_running_queries(conn: Connection, cfg: Config) -> CheckResult:
+    """Active queries running longer than the configured limit."""
     limits = cfg.long_queries
     rows = [r for r in conn.fetchall(LONG_QUERIES_SQL) if r["seconds"] >= limits.warn_seconds]
     if not rows:

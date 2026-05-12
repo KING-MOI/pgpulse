@@ -16,6 +16,7 @@ WHERE backend_type = 'client backend'
 
 @check("connections")
 def connection_saturation(conn: Connection, cfg: Config) -> CheckResult:
+    """Client connections in use versus max_connections."""
     row = conn.fetchall(CONNECTIONS_SQL)[0]
     used, limit = row["used"], row["max"]
     ratio = used / limit

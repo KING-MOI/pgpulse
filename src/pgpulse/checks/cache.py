@@ -13,6 +13,7 @@ FROM pg_statio_user_tables
 
 @check("cache_hit")
 def cache_hit_ratio(conn: Connection, cfg: Config) -> CheckResult:
+    """Share of table block reads served from shared buffers."""
     row = conn.fetchall(CACHE_HIT_SQL)[0]
     hit, read = row["hit"] or 0.0, row["read"] or 0.0
     if hit + read == 0:

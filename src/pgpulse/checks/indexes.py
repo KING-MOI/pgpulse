@@ -17,6 +17,7 @@ ORDER BY size_bytes DESC
 
 @check("unused_indexes")
 def unused_indexes(conn: Connection, cfg: Config) -> CheckResult:
+    """Non-unique indexes that have never been scanned."""
     floor = cfg.unused_indexes.min_size_bytes
     rows = [r for r in conn.fetchall(UNUSED_INDEXES_SQL) if r["size_bytes"] >= floor]
     if not rows:
