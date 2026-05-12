@@ -49,3 +49,12 @@ def test_check_flag_limits_checks(capsys):
     out = capsys.readouterr().out
     assert "cache_hit" in out
     assert "bloat" not in out
+
+
+def test_list_checks_does_not_connect(capsys):
+    def explode(dsn):
+        raise AssertionError("should not connect")
+
+    assert main(["--list-checks"], connect=explode) == 0
+    out = capsys.readouterr().out
+    assert "cache_hit" in out and "shared buffers" in out
