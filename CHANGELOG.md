@@ -53,3 +53,4 @@
 - double-check link checker behavior
 - follow up on config defaults
 - considered ci caching; parked for now
+- double-check docs example behavior
