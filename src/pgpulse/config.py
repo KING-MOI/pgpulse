@@ -1,5 +1,8 @@
 from __future__ import annotations
 
+import tomllib
+from pathlib import Path
+
 from pydantic import BaseModel
 
 
@@ -35,3 +38,8 @@ class Config(BaseModel):
     long_queries: LongQueriesConfig = LongQueriesConfig()
     unused_indexes: UnusedIndexesConfig = UnusedIndexesConfig()
     bloat: BloatConfig = BloatConfig()
+
+
+def load(path: Path) -> Config:
+    with path.open("rb") as fh:
+        return Config.model_validate(tomllib.load(fh))
