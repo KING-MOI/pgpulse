@@ -58,3 +58,12 @@ def test_list_checks_does_not_connect(capsys):
     assert main(["--list-checks"], connect=explode) == 0
     out = capsys.readouterr().out
     assert "cache_hit" in out and "shared buffers" in out
+
+
+def test_config_file_supplies_dsn_and_flag_overrides_it(tmp_path):
+    path = tmp_path / "pgpulse.toml"
+    path.write_text('dsn = "from-file"\n')
+    connect = connector(healthy())
+    main(["--config", str(path)], connect=connect)
+    main(["--config", str(path), "--dsn", "from-flag"], connect=connect)
+    assert [c.dsn for c in connect.conns] == ["from-file", "from-flag"]

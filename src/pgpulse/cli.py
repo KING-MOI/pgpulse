@@ -3,11 +3,12 @@ from __future__ import annotations
 import argparse
 import sys
 from collections.abc import Callable
+from pathlib import Path
 
 from rich.console import Console
 
 from pgpulse.checks import REGISTRY
-from pgpulse.config import Config
+from pgpulse.config import Config, load
 from pgpulse.db import Connection, PsycopgConnection
 from pgpulse.report import render
 from pgpulse.result import Status
@@ -20,6 +21,7 @@ def build_parser() -> argparse.ArgumentParser:
     parser.add_argument(
         "-c", "--check", action="append", choices=sorted(REGISTRY), help="run only this check (repeatable)"
     )
+    parser.add_argument("--config", type=Path, help="path to a pgpulse.toml file")
     parser.add_argument("--list-checks", action="store_true", help="list available checks and exit")
     return parser
 
@@ -31,7 +33,9 @@ def main(argv: list[str] | None = None, connect: Callable[[str], Connection] = P
         for name, fn in REGISTRY.items():
             console.print(f"[bold]{name}[/]  {fn.__doc__ or ''}")
         return 0
-    cfg = Config(dsn=args.dsn)
+    cfg = load(args.config) if args.config else Config()
+    if args.dsn:
+        cfg.dsn = args.dsn
     try:
         conn = connect(cfg.dsn or "")
     except ConnectionError as exc:
