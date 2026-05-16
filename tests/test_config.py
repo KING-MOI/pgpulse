@@ -14,3 +14,13 @@ def test_load_overrides_thresholds(tmp_path):
     assert cfg.dsn == "postgresql:///app"
     assert cfg.cache_hit.warn == 0.9
     assert cfg.cache_hit.fail == 0.95
+
+
+def test_unknown_keys_are_rejected(tmp_path):
+    import pytest
+    from pydantic import ValidationError
+
+    path = tmp_path / "pgpulse.toml"
+    path.write_text("[cache_hit]\nwran = 0.9\n")
+    with pytest.raises(ValidationError, match="wran"):
+        load(path)
