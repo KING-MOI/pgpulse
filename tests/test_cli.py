@@ -67,3 +67,14 @@ def test_config_file_supplies_dsn_and_flag_overrides_it(tmp_path):
     main(["--config", str(path)], connect=connect)
     main(["--config", str(path), "--dsn", "from-flag"], connect=connect)
     assert [c.dsn for c in connect.conns] == ["from-file", "from-flag"]
+
+
+def test_missing_config_file_exits_two(tmp_path, capsys):
+    assert main(["--config", str(tmp_path / "nope.toml")], connect=connector(healthy())) == 2
+    assert "bad config" in capsys.readouterr().err
+
+
+def test_invalid_config_exits_two(tmp_path):
+    path = tmp_path / "pgpulse.toml"
+    path.write_text("[bloat]\nwarn = 'lots'\n")
+    assert main(["--config", str(path)], connect=connector(healthy())) == 2

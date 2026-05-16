@@ -33,7 +33,11 @@ def main(argv: list[str] | None = None, connect: Callable[[str], Connection] = P
         for name, fn in REGISTRY.items():
             console.print(f"[bold]{name}[/]  {fn.__doc__ or ''}")
         return 0
-    cfg = load(args.config) if args.config else Config()
+    try:
+        cfg = load(args.config) if args.config else Config()
+    except (OSError, ValueError) as exc:
+        Console(stderr=True).print(f"[bold red]bad config:[/] {exc}")
+        return 2
     if args.dsn:
         cfg.dsn = args.dsn
     try:
