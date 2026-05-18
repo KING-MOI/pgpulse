@@ -2,8 +2,11 @@ from __future__ import annotations
 
 import tomllib
 from pathlib import Path
+from typing import Annotated
 
-from pydantic import BaseModel, ConfigDict
+from pydantic import BaseModel, ConfigDict, Field
+
+Ratio = Annotated[float, Field(ge=0, le=1)]
 
 
 class Section(BaseModel):
@@ -11,13 +14,13 @@ class Section(BaseModel):
 
 
 class CacheHitConfig(Section):
-    warn: float = 0.99
-    fail: float = 0.95
+    warn: Ratio = 0.99
+    fail: Ratio = 0.95
 
 
 class ConnectionsConfig(Section):
-    warn: float = 0.8
-    fail: float = 0.95
+    warn: Ratio = 0.8
+    fail: Ratio = 0.95
 
 
 class LongQueriesConfig(Section):
@@ -30,8 +33,8 @@ class UnusedIndexesConfig(Section):
 
 
 class BloatConfig(Section):
-    warn: float = 0.2
-    fail: float = 0.5
+    warn: Ratio = 0.2
+    fail: Ratio = 0.5
     min_rows: int = 10_000
 
 

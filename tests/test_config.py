@@ -24,3 +24,11 @@ def test_unknown_keys_are_rejected(tmp_path):
     path.write_text("[cache_hit]\nwran = 0.9\n")
     with pytest.raises(ValidationError, match="wran"):
         load(path)
+
+
+def test_ratios_must_be_fractions():
+    import pytest
+    from pydantic import ValidationError
+
+    with pytest.raises(ValidationError):
+        Config.model_validate({"cache_hit": {"warn": 99}})
