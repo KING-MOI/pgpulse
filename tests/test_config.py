@@ -9,10 +9,10 @@ def test_defaults_are_sane():
 
 def test_load_overrides_thresholds(tmp_path):
     path = tmp_path / "pgpulse.toml"
-    path.write_text('dsn = "postgresql:///app"\n\n[cache_hit]\nwarn = 0.9\n')
+    path.write_text('dsn = "postgresql:///app"\n\n[cache_hit]\nwarn = 0.97\n')
     cfg = load(path)
     assert cfg.dsn == "postgresql:///app"
-    assert cfg.cache_hit.warn == 0.9
+    assert cfg.cache_hit.warn == 0.97
     assert cfg.cache_hit.fail == 0.95
 
 
@@ -32,3 +32,13 @@ def test_ratios_must_be_fractions():
 
     with pytest.raises(ValidationError):
         Config.model_validate({"cache_hit": {"warn": 99}})
+
+
+def test_thresholds_must_be_ordered():
+    import pytest
+    from pydantic import ValidationError
+
+    with pytest.raises(ValidationError, match="cache_hit.fail"):
+        Config.model_validate({"cache_hit": {"warn": 0.9, "fail": 0.95}})
+    with pytest.raises(ValidationError, match="fail_seconds"):
+        Config.model_validate({"long_queries": {"warn_seconds": 600}})

@@ -4,7 +4,7 @@ import tomllib
 from pathlib import Path
 from typing import Annotated
 
-from pydantic import BaseModel, ConfigDict, Field
+from pydantic import BaseModel, ConfigDict, Field, model_validator
 
 Ratio = Annotated[float, Field(ge=0, le=1)]
 
@@ -17,13 +17,30 @@ class CacheHitConfig(Section):
     warn: Ratio = 0.99
     fail: Ratio = 0.95
 
+    @model_validator(mode="after")
+    def _ordered(self) -> CacheHitConfig:
+        if self.fail > self.warn:
+            raise ValueError("cache_hit.fail must not be above cache_hit.warn")
+        return self
 
-class ConnectionsConfig(Section):
+
+class Ascending(Section):
+    @model_validator(mode="after")
+    def _ordered(self) -> Ascending:
+        fields = [f for f in type(self).model_fields if f.startswith("warn")]
+        for warn in fields:
+            fail = warn.replace("warn", "fail")
+            if getattr(self, warn) > getattr(self, fail):
+                raise ValueError(f"{fail} must not be below {warn}")
+        return self
+
+
+class ConnectionsConfig(Ascending):
     warn: Ratio = 0.8
     fail: Ratio = 0.95
 
 
-class LongQueriesConfig(Section):
+class LongQueriesConfig(Ascending):
     warn_seconds: float = 60
     fail_seconds: float = 300
 
@@ -32,7 +49,7 @@ class UnusedIndexesConfig(Section):
     min_size_bytes: int = 1024 * 1024
 
 
-class BloatConfig(Section):
+class BloatConfig(Ascending):
     warn: Ratio = 0.2
     fail: Ratio = 0.5
     min_rows: int = 10_000
