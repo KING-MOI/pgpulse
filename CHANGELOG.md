@@ -19,3 +19,4 @@
 - follow up on link checker
 - follow up on release checklist
 - double-check docs example behavior
+- edge case observed while testing
