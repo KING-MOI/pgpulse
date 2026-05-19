@@ -20,6 +20,9 @@ pip install pgpulse
 pgpulse --dsn "postgresql://user@localhost/app"
 ```
 
+Without `--dsn`, pgpulse reads `PGPULSE_DSN`. If that is unset too, libpq
+falls back to the usual `PGHOST`, `PGUSER`, `PGDATABASE` and friends.
+
 Run a subset of checks:
 
 ```sh
