@@ -6,3 +6,4 @@
 - double-check release checklist behavior
 - edge case observed while testing
 - double-check config defaults behavior
+- follow up on ci caching
