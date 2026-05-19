@@ -1,6 +1,7 @@
 from __future__ import annotations
 
 import argparse
+import os
 import sys
 from collections.abc import Callable
 from pathlib import Path
@@ -17,7 +18,11 @@ from pgpulse.runner import run_checks
 
 def build_parser() -> argparse.ArgumentParser:
     parser = argparse.ArgumentParser(prog="pgpulse", description="Health checks for Postgres.")
-    parser.add_argument("--dsn", default="", help="libpq connection string or URI")
+    parser.add_argument(
+        "--dsn",
+        default=os.environ.get("PGPULSE_DSN", ""),
+        help="libpq connection string or URI (default: $PGPULSE_DSN, then libpq PG* variables)",
+    )
     parser.add_argument(
         "-c", "--check", action="append", choices=sorted(REGISTRY), help="run only this check (repeatable)"
     )

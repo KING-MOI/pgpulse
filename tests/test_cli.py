@@ -78,3 +78,10 @@ def test_invalid_config_exits_two(tmp_path):
     path = tmp_path / "pgpulse.toml"
     path.write_text("[bloat]\nwarn = 'lots'\n")
     assert main(["--config", str(path)], connect=connector(healthy())) == 2
+
+
+def test_dsn_falls_back_to_environment(monkeypatch):
+    monkeypatch.setenv("PGPULSE_DSN", "from-env")
+    connect = connector(healthy())
+    main([], connect=connect)
+    assert connect.conns[0].dsn == "from-env"
