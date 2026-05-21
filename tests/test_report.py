@@ -19,3 +19,12 @@ def test_report_lists_every_check():
 def test_report_prints_details():
     text = output([CheckResult("bloat", Status.WARN, "1 bloated", ["public.a: 30% dead tuples"])])
     assert "public.a: 30% dead tuples" in text
+
+
+def test_json_output_is_machine_readable():
+    import json
+
+    from pgpulse.report import to_json
+
+    data = json.loads(to_json([CheckResult("bloat", Status.WARN, "1 bloated", ["public.a"])]))
+    assert data == [{"name": "bloat", "status": "warn", "summary": "1 bloated", "details": ["public.a"]}]

@@ -1,5 +1,8 @@
 from __future__ import annotations
 
+import json
+from dataclasses import asdict
+
 from rich.console import Console
 from rich.table import Table
 
@@ -24,3 +27,7 @@ def render(results: list[CheckResult], console: Console) -> None:
     for r in results:
         for line in r.details:
             console.print(f"  [{STYLES[r.status]}]{r.name}[/] {line}")
+
+
+def to_json(results: list[CheckResult]) -> str:
+    return json.dumps([asdict(r) | {"status": r.status.name.lower()} for r in results], indent=2)
