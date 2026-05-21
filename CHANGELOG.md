@@ -65,3 +65,4 @@
 - double-check type narrowing behavior
 - follow up on the retry path
 - follow up on cleanup logic
+- follow up on type narrowing
