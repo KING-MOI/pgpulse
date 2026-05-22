@@ -11,7 +11,7 @@ from rich.console import Console
 from pgpulse.checks import REGISTRY
 from pgpulse.config import Config, load
 from pgpulse.db import Connection, PsycopgConnection
-from pgpulse.report import render
+from pgpulse.report import render, to_json
 from pgpulse.result import Status
 from pgpulse.runner import run_checks
 
@@ -26,6 +26,7 @@ def build_parser() -> argparse.ArgumentParser:
     parser.add_argument(
         "-c", "--check", action="append", choices=sorted(REGISTRY), help="run only this check (repeatable)"
     )
+    parser.add_argument("--format", choices=["table", "json"], default="table", help="output format")
     parser.add_argument("--config", type=Path, help="path to a pgpulse.toml file")
     parser.add_argument("--list-checks", action="store_true", help="list available checks and exit")
     return parser
@@ -54,7 +55,10 @@ def main(argv: list[str] | None = None, connect: Callable[[str], Connection] = P
         results = run_checks(conn, cfg, args.check)
     finally:
         conn.close()
-    render(results, console)
+    if args.format == "json":
+        print(to_json(results))
+    else:
+        render(results, console)
     worst = max((r.status for r in results), default=Status.OK)
     return 1 if worst >= Status.FAIL else 0
 

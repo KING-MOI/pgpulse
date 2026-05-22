@@ -85,3 +85,11 @@ def test_dsn_falls_back_to_environment(monkeypatch):
     connect = connector(healthy())
     main([], connect=connect)
     assert connect.conns[0].dsn == "from-env"
+
+
+def test_json_format(capsys):
+    import json
+
+    main(["--format", "json"], connect=connector(healthy()))
+    data = json.loads(capsys.readouterr().out)
+    assert {d["name"] for d in data} >= {"cache_hit", "connections"}
