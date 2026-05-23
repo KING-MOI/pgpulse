@@ -27,6 +27,12 @@ def build_parser() -> argparse.ArgumentParser:
         "-c", "--check", action="append", choices=sorted(REGISTRY), help="run only this check (repeatable)"
     )
     parser.add_argument("--format", choices=["table", "json"], default="table", help="output format")
+    parser.add_argument(
+        "--fail-on",
+        choices=["warn", "fail"],
+        default="fail",
+        help="lowest status that makes the exit code non-zero",
+    )
     parser.add_argument("--config", type=Path, help="path to a pgpulse.toml file")
     parser.add_argument("--list-checks", action="store_true", help="list available checks and exit")
     return parser
@@ -60,7 +66,8 @@ def main(argv: list[str] | None = None, connect: Callable[[str], Connection] = P
     else:
         render(results, console)
     worst = max((r.status for r in results), default=Status.OK)
-    return 1 if worst >= Status.FAIL else 0
+    threshold = Status.WARN if args.fail_on == "warn" else Status.FAIL
+    return 1 if worst >= threshold else 0
 
 
 if __name__ == "__main__":

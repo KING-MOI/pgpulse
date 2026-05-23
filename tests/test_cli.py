@@ -93,3 +93,10 @@ def test_json_format(capsys):
     main(["--format", "json"], connect=connector(healthy()))
     data = json.loads(capsys.readouterr().out)
     assert {d["name"] for d in data} >= {"cache_hit", "connections"}
+
+
+def test_fail_on_warn_turns_warnings_into_failures():
+    responses = healthy()
+    responses[CONNECTIONS_SQL] = [{"used": 85, "max": 100}]
+    assert main([], connect=connector(responses)) == 0
+    assert main(["--fail-on", "warn"], connect=connector(responses)) == 1
