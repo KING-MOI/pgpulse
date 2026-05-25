@@ -39,8 +39,9 @@ pgpulse --list-checks
 
 | code | meaning |
 |------|---------|
-| 0 | every check passed or only warned |
+| 0 | every check passed or only warned (see `--fail-on warn`) |
 | 1 | at least one check failed or errored |
+| 2 | bad config file |
 | 3 | could not connect to the database |
 
 ## License
