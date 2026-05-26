@@ -1,6 +1,7 @@
 from __future__ import annotations
 
 import json
+from collections import Counter
 from dataclasses import asdict
 
 from rich.console import Console
@@ -27,6 +28,8 @@ def render(results: list[CheckResult], console: Console) -> None:
     for r in results:
         for line in r.details:
             console.print(f"  [{STYLES[r.status]}]{r.name}[/] {line}")
+    counts = Counter(r.status for r in results)
+    console.print(", ".join(f"[{STYLES[s]}]{counts[s]} {s.name.lower()}[/]" for s in Status))
 
 
 def to_json(results: list[CheckResult]) -> str:
