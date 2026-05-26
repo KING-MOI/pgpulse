@@ -50,6 +50,11 @@ class IdleInTransactionConfig(Ascending):
     fail_seconds: float = 300
 
 
+class BlockingLocksConfig(Ascending):
+    warn_seconds: float = 10
+    fail_seconds: float = 120
+
+
 class UnusedIndexesConfig(Section):
     min_size_bytes: int = 1024 * 1024
 
@@ -66,6 +71,7 @@ class Config(Section):
     connections: ConnectionsConfig = ConnectionsConfig()
     long_queries: LongQueriesConfig = LongQueriesConfig()
     idle_in_transaction: IdleInTransactionConfig = IdleInTransactionConfig()
+    blocking_locks: BlockingLocksConfig = BlockingLocksConfig()
     unused_indexes: UnusedIndexesConfig = UnusedIndexesConfig()
     bloat: BloatConfig = BloatConfig()
 

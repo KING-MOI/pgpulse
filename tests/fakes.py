@@ -24,6 +24,7 @@ def healthy() -> dict[str, list[dict[str, Any]]]:
     from pgpulse.checks.cache import CACHE_HIT_SQL
     from pgpulse.checks.connections import CONNECTIONS_SQL
     from pgpulse.checks.indexes import UNUSED_INDEXES_SQL
+    from pgpulse.checks.locks import BLOCKED_SQL
     from pgpulse.checks.queries import IDLE_IN_TRANSACTION_SQL, LONG_QUERIES_SQL
 
     return {
@@ -33,4 +34,5 @@ def healthy() -> dict[str, list[dict[str, Any]]]:
         IDLE_IN_TRANSACTION_SQL: [],
         UNUSED_INDEXES_SQL: [],
         DEAD_TUPLES_SQL: [],
+        BLOCKED_SQL: [],
     }
