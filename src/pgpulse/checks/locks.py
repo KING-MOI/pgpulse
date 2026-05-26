@@ -8,7 +8,7 @@ from pgpulse.result import CheckResult, Status
 BLOCKED_SQL = """
 SELECT pid, pg_blocking_pids(pid) AS blocked_by,
        extract(epoch FROM now() - query_start)::float AS seconds,
-       left(query, 80) AS query
+       left(regexp_replace(query, '[[:space:]]+', ' ', 'g'), 80) AS query
 FROM pg_stat_activity
 WHERE cardinality(pg_blocking_pids(pid)) > 0
 """

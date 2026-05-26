@@ -7,7 +7,7 @@ from pgpulse.result import CheckResult, Status
 
 LONG_QUERIES_SQL = """
 SELECT pid, usename, extract(epoch FROM now() - query_start)::float AS seconds,
-       left(query, 80) AS query
+       left(regexp_replace(query, '[[:space:]]+', ' ', 'g'), 80) AS query
 FROM pg_stat_activity
 WHERE state = 'active' AND pid <> pg_backend_pid()
 ORDER BY query_start
@@ -29,7 +29,7 @@ def long_running_queries(conn: Connection, cfg: Config) -> CheckResult:
 
 IDLE_IN_TRANSACTION_SQL = """
 SELECT pid, usename, extract(epoch FROM now() - state_change)::float AS seconds,
-       left(query, 80) AS query
+       left(regexp_replace(query, '[[:space:]]+', ' ', 'g'), 80) AS query
 FROM pg_stat_activity
 WHERE state IN ('idle in transaction', 'idle in transaction (aborted)')
 ORDER BY state_change
