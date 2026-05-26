@@ -30,3 +30,14 @@ def test_query_past_warn_threshold_warns():
 
 def test_query_past_fail_threshold_fails():
     assert run(row(1, 600.0)).status is Status.FAIL
+
+
+def test_idle_in_transaction_levels():
+    from pgpulse.checks.queries import IDLE_IN_TRANSACTION_SQL, idle_in_transaction
+
+    def run_idle(*rows):
+        return idle_in_transaction(FakeConnection({IDLE_IN_TRANSACTION_SQL: list(rows)}), Config())
+
+    assert run_idle(row(1, 5.0)).status is Status.OK
+    assert run_idle(row(1, 45.0)).status is Status.WARN
+    assert run_idle(row(1, 45.0), row(2, 900.0)).status is Status.FAIL

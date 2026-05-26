@@ -45,6 +45,11 @@ class LongQueriesConfig(Ascending):
     fail_seconds: float = 300
 
 
+class IdleInTransactionConfig(Ascending):
+    warn_seconds: float = 30
+    fail_seconds: float = 300
+
+
 class UnusedIndexesConfig(Section):
     min_size_bytes: int = 1024 * 1024
 
@@ -60,6 +65,7 @@ class Config(Section):
     cache_hit: CacheHitConfig = CacheHitConfig()
     connections: ConnectionsConfig = ConnectionsConfig()
     long_queries: LongQueriesConfig = LongQueriesConfig()
+    idle_in_transaction: IdleInTransactionConfig = IdleInTransactionConfig()
     unused_indexes: UnusedIndexesConfig = UnusedIndexesConfig()
     bloat: BloatConfig = BloatConfig()
 

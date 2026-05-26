@@ -25,3 +25,25 @@ def long_running_queries(conn: Connection, cfg: Config) -> CheckResult:
     status = Status.FAIL if worst >= limits.fail_seconds else Status.WARN
     details = [f"pid {r['pid']} ({r['usename']}) {r['seconds']:.0f}s: {r['query']}" for r in rows]
     return CheckResult("long_queries", status, f"{len(rows)} queries over {limits.warn_seconds:g}s", details)
+
+
+IDLE_IN_TRANSACTION_SQL = """
+SELECT pid, usename, extract(epoch FROM now() - state_change)::float AS seconds,
+       left(query, 80) AS query
+FROM pg_stat_activity
+WHERE state IN ('idle in transaction', 'idle in transaction (aborted)')
+ORDER BY state_change
+"""
+
+
+@check("idle_in_transaction")
+def idle_in_transaction(conn: Connection, cfg: Config) -> CheckResult:
+    """Sessions holding a transaction open while doing nothing."""
+    limits = cfg.idle_in_transaction
+    rows = [r for r in conn.fetchall(IDLE_IN_TRANSACTION_SQL) if r["seconds"] >= limits.warn_seconds]
+    if not rows:
+        return CheckResult("idle_in_transaction", Status.OK, "no idle transactions")
+    worst = max(r["seconds"] for r in rows)
+    status = Status.FAIL if worst >= limits.fail_seconds else Status.WARN
+    details = [f"pid {r['pid']} ({r['usename']}) idle {r['seconds']:.0f}s after: {r['query']}" for r in rows]
+    return CheckResult("idle_in_transaction", status, f"{len(rows)} idle transactions", details)

@@ -24,12 +24,13 @@ def healthy() -> dict[str, list[dict[str, Any]]]:
     from pgpulse.checks.cache import CACHE_HIT_SQL
     from pgpulse.checks.connections import CONNECTIONS_SQL
     from pgpulse.checks.indexes import UNUSED_INDEXES_SQL
-    from pgpulse.checks.queries import LONG_QUERIES_SQL
+    from pgpulse.checks.queries import IDLE_IN_TRANSACTION_SQL, LONG_QUERIES_SQL
 
     return {
         CACHE_HIT_SQL: [{"hit": 999.0, "read": 1.0}],
         CONNECTIONS_SQL: [{"used": 5, "max": 100}],
         LONG_QUERIES_SQL: [],
+        IDLE_IN_TRANSACTION_SQL: [],
         UNUSED_INDEXES_SQL: [],
         DEAD_TUPLES_SQL: [],
     }
