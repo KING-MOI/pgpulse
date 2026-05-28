@@ -8,7 +8,13 @@ MB = 1024 * 1024
 
 
 def idx(name, size):
-    return {"schemaname": "public", "relname": "orders", "indexrelname": name, "size_bytes": size}
+    return {
+        "schemaname": "public",
+        "relname": "orders",
+        "indexrelname": name,
+        "size_bytes": size,
+        "size": f"{size // MB} MB",
+    }
 
 
 def run(*rows):
@@ -26,4 +32,4 @@ def test_tiny_unused_indexes_are_ignored():
 def test_large_unused_index_warns():
     result = run(idx("orders_big", 50 * MB), idx("orders_tiny", 8192))
     assert result.status is Status.WARN
-    assert result.details == ["public.orders_big on orders (52428800 bytes)"]
+    assert result.details == ["public.orders_big on orders (50 MB)"]
