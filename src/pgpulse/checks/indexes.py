@@ -3,7 +3,7 @@ from __future__ import annotations
 from pgpulse.checks import check
 from pgpulse.config import Config
 from pgpulse.db import Connection
-from pgpulse.result import CheckResult, Status
+from pgpulse.result import CheckResult, Status, plural
 
 UNUSED_INDEXES_SQL = """
 SELECT s.schemaname, s.relname, s.indexrelname,
@@ -25,4 +25,6 @@ def unused_indexes(conn: Connection, cfg: Config) -> CheckResult:
     details = [
         f"{r['schemaname']}.{r['indexrelname']} on {r['relname']} ({r['size_bytes']} bytes)" for r in rows
     ]
-    return CheckResult("unused_indexes", Status.WARN, f"{len(rows)} unused indexes", details)
+    return CheckResult(
+        "unused_indexes", Status.WARN, plural(len(rows), "unused index", "unused indexes"), details
+    )

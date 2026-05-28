@@ -17,3 +17,7 @@ class CheckResult:
     status: Status
     summary: str
     details: list[str] = field(default_factory=list)
+
+
+def plural(n: int, one: str, many: str | None = None) -> str:
+    return f"{n} {one if n == 1 else many or one + 's'}"

@@ -3,7 +3,7 @@ from __future__ import annotations
 from pgpulse.checks import check
 from pgpulse.config import Config
 from pgpulse.db import Connection
-from pgpulse.result import CheckResult, Status
+from pgpulse.result import CheckResult, Status, plural
 
 DEAD_TUPLES_SQL = """
 SELECT schemaname, relname, n_live_tup AS live, n_dead_tup AS dead
@@ -28,4 +28,4 @@ def table_bloat(conn: Connection, cfg: Config) -> CheckResult:
         details.append(f"{r['schemaname']}.{r['relname']}: {ratio:.0%} dead tuples")
     if not details:
         return CheckResult("bloat", Status.OK, "no bloated tables")
-    return CheckResult("bloat", status, f"{len(details)} bloated tables", details)
+    return CheckResult("bloat", status, plural(len(details), "bloated table"), details)

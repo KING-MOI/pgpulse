@@ -3,7 +3,7 @@ from __future__ import annotations
 from pgpulse.checks import check
 from pgpulse.config import Config
 from pgpulse.db import Connection
-from pgpulse.result import CheckResult, Status
+from pgpulse.result import CheckResult, Status, plural
 
 BLOCKED_SQL = """
 SELECT pid, pg_blocking_pids(pid) AS blocked_by,
@@ -27,4 +27,4 @@ def blocking_locks(conn: Connection, cfg: Config) -> CheckResult:
         f"pid {r['pid']} waiting {r['seconds']:.0f}s on {', '.join(map(str, r['blocked_by']))}: {r['query']}"
         for r in rows
     ]
-    return CheckResult("blocking_locks", status, f"{len(rows)} blocked sessions", details)
+    return CheckResult("blocking_locks", status, plural(len(rows), "blocked session"), details)
