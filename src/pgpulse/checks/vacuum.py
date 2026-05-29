@@ -37,6 +37,6 @@ def xid_wraparound(conn: Connection, cfg: Config) -> CheckResult:
     return CheckResult(
         "xid_wraparound",
         status,
-        f"oldest xid in {worst['datname']} is {ratio:.1%} of the way to wraparound",
+        f"{worst['datname']} has used {ratio:.1%} of xid space",
         details,
     )
