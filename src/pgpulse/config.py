@@ -55,6 +55,11 @@ class BlockingLocksConfig(Ascending):
     fail_seconds: float = 120
 
 
+class XidWraparoundConfig(Ascending):
+    warn: Ratio = 0.5
+    fail: Ratio = 0.75
+
+
 class UnusedIndexesConfig(Section):
     min_size_bytes: int = 1024 * 1024
 
@@ -74,6 +79,7 @@ class Config(Section):
     blocking_locks: BlockingLocksConfig = BlockingLocksConfig()
     unused_indexes: UnusedIndexesConfig = UnusedIndexesConfig()
     bloat: BloatConfig = BloatConfig()
+    xid_wraparound: XidWraparoundConfig = XidWraparoundConfig()
 
 
 def load(path: Path) -> Config:
