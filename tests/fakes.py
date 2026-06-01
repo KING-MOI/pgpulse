@@ -7,10 +7,12 @@ class FakeConnection:
     def __init__(self, responses: dict[str, list[dict[str, Any]]] | None = None) -> None:
         self.responses = responses or {}
         self.queries: list[str] = []
+        self.params: list[tuple[Any, ...] | None] = []
         self.closed = False
 
     def fetchall(self, sql: str, params: tuple[Any, ...] | None = None) -> list[dict[str, Any]]:
         self.queries.append(sql)
+        self.params.append(params)
         if sql not in self.responses:
             raise AssertionError(f"unexpected query: {sql[:60]!r}")
         return self.responses[sql]

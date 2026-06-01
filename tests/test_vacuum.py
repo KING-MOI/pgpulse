@@ -49,3 +49,12 @@ def test_never_vacuumed_fails():
     result = run_stale(stale(None))
     assert result.status is Status.FAIL
     assert "never vacuumed" in result.details[0]
+
+
+def test_dead_row_floor_is_passed_to_the_query():
+    from pgpulse.checks.vacuum import STALE_VACUUM_SQL, vacuum_age
+
+    conn = FakeConnection({STALE_VACUUM_SQL: []})
+    cfg = Config.model_validate({"vacuum_age": {"min_dead_rows": 42}})
+    vacuum_age(conn, cfg)
+    assert conn.params == [(42,)]
