@@ -60,6 +60,12 @@ class XidWraparoundConfig(Ascending):
     fail: Ratio = 0.75
 
 
+class VacuumAgeConfig(Section):
+    warn_days: float = 7
+    fail_days: float = 30
+    min_dead_rows: int = 10_000
+
+
 class UnusedIndexesConfig(Section):
     min_size_bytes: int = 1024 * 1024
 
@@ -80,6 +86,7 @@ class Config(Section):
     unused_indexes: UnusedIndexesConfig = UnusedIndexesConfig()
     bloat: BloatConfig = BloatConfig()
     xid_wraparound: XidWraparoundConfig = XidWraparoundConfig()
+    vacuum_age: VacuumAgeConfig = VacuumAgeConfig()
 
 
 def load(path: Path) -> Config:
