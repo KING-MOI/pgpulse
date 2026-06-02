@@ -33,3 +33,16 @@ def test_large_unused_index_warns():
     result = run(idx("orders_big", 50 * MB), idx("orders_tiny", 8192))
     assert result.status is Status.WARN
     assert result.details == ["public.orders_big on orders (50 MB)"]
+
+
+def test_invalid_indexes_fail():
+    from pgpulse.checks.indexes import INVALID_INDEXES_SQL, invalid_indexes
+
+    ok = invalid_indexes(FakeConnection({INVALID_INDEXES_SQL: []}), Config())
+    assert ok.status is Status.OK
+    bad = invalid_indexes(
+        FakeConnection({INVALID_INDEXES_SQL: [{"schemaname": "public", "indexrelname": "orders_ccnew"}]}),
+        Config(),
+    )
+    assert bad.status is Status.FAIL
+    assert bad.details == ["public.orders_ccnew"]

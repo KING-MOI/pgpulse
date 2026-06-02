@@ -27,3 +27,24 @@ def unused_indexes(conn: Connection, cfg: Config) -> CheckResult:
     return CheckResult(
         "unused_indexes", Status.WARN, plural(len(rows), "unused index", "unused indexes"), details
     )
+
+
+INVALID_INDEXES_SQL = """
+SELECT n.nspname AS schemaname, c.relname AS indexrelname
+FROM pg_index i
+JOIN pg_class c ON c.oid = i.indexrelid
+JOIN pg_namespace n ON n.oid = c.relnamespace
+WHERE NOT i.indisvalid
+"""
+
+
+@check("invalid_indexes")
+def invalid_indexes(conn: Connection, cfg: Config) -> CheckResult:
+    """Indexes left invalid by a failed CREATE INDEX CONCURRENTLY."""
+    rows = conn.fetchall(INVALID_INDEXES_SQL)
+    if not rows:
+        return CheckResult("invalid_indexes", Status.OK, "no invalid indexes")
+    details = [f"{r['schemaname']}.{r['indexrelname']}" for r in rows]
+    return CheckResult(
+        "invalid_indexes", Status.FAIL, plural(len(rows), "invalid index", "invalid indexes"), details
+    )
