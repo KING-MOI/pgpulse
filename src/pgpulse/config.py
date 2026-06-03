@@ -66,6 +66,11 @@ class VacuumAgeConfig(Section):
     min_dead_rows: int = 10_000
 
 
+class ReplicationLagConfig(Ascending):
+    warn_seconds: float = 30
+    fail_seconds: float = 300
+
+
 class UnusedIndexesConfig(Section):
     min_size_bytes: int = 1024 * 1024
 
@@ -93,6 +98,7 @@ class Config(Section):
     bloat: BloatConfig = BloatConfig()
     xid_wraparound: XidWraparoundConfig = XidWraparoundConfig()
     vacuum_age: VacuumAgeConfig = VacuumAgeConfig()
+    replication_lag: ReplicationLagConfig = ReplicationLagConfig()
 
 
 def load(path: Path) -> Config:

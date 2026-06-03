@@ -33,6 +33,7 @@ def healthy() -> dict[str, list[dict[str, Any]]]:
     )
     from pgpulse.checks.locks import BLOCKED_SQL
     from pgpulse.checks.queries import IDLE_IN_TRANSACTION_SQL, LONG_QUERIES_SQL
+    from pgpulse.checks.replication import REPLICATION_LAG_SQL
     from pgpulse.checks.vacuum import STALE_VACUUM_SQL, XID_AGE_SQL
 
     return {
@@ -46,6 +47,7 @@ def healthy() -> dict[str, list[dict[str, Any]]]:
         SEQ_SCANS_SQL: [],
         DEAD_TUPLES_SQL: [],
         BLOCKED_SQL: [],
+        REPLICATION_LAG_SQL: [],
         STALE_VACUUM_SQL: [],
         XID_AGE_SQL: [{"datname": "app", "age": 1_000_000}],
     }
