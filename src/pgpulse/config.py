@@ -70,6 +70,11 @@ class UnusedIndexesConfig(Section):
     min_size_bytes: int = 1024 * 1024
 
 
+class IndexUsageConfig(Section):
+    warn: Ratio = 0.5
+    min_rows: int = 10_000
+
+
 class BloatConfig(Ascending):
     warn: Ratio = 0.2
     fail: Ratio = 0.5
@@ -84,6 +89,7 @@ class Config(Section):
     idle_in_transaction: IdleInTransactionConfig = IdleInTransactionConfig()
     blocking_locks: BlockingLocksConfig = BlockingLocksConfig()
     unused_indexes: UnusedIndexesConfig = UnusedIndexesConfig()
+    index_usage: IndexUsageConfig = IndexUsageConfig()
     bloat: BloatConfig = BloatConfig()
     xid_wraparound: XidWraparoundConfig = XidWraparoundConfig()
     vacuum_age: VacuumAgeConfig = VacuumAgeConfig()

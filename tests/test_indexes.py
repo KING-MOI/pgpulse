@@ -56,3 +56,23 @@ def test_duplicate_indexes_warn():
     assert result.status is Status.WARN
     assert result.summary == "1 set of duplicate indexes"
     assert result.details == ["public.orders: orders_a, orders_a_copy"]
+
+
+def scans(seq, idx):
+    return {"schemaname": "public", "relname": "orders", "seq_scan": seq, "idx_scan": idx, "rows": 50_000}
+
+
+def run_usage(*rows):
+    from pgpulse.checks.indexes import SEQ_SCANS_SQL, index_usage
+
+    return index_usage(FakeConnection({SEQ_SCANS_SQL: list(rows)}), Config())
+
+
+def test_indexed_tables_are_ok():
+    assert run_usage(scans(1, 999)).status is Status.OK
+
+
+def test_seq_scan_heavy_table_warns():
+    result = run_usage(scans(90, 10))
+    assert result.status is Status.WARN
+    assert result.details == ["public.orders: 10% index scans over 50,000 rows"]

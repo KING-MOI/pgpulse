@@ -74,3 +74,29 @@ def duplicate_indexes(conn: Connection, cfg: Config) -> CheckResult:
     return CheckResult(
         "duplicate_indexes", Status.WARN, plural(len(rows), "set") + " of duplicate indexes", details
     )
+
+
+SEQ_SCANS_SQL = """
+SELECT schemaname, relname, seq_scan, coalesce(idx_scan, 0) AS idx_scan, n_live_tup AS rows
+FROM pg_stat_user_tables
+WHERE n_live_tup >= %s AND seq_scan > 0
+ORDER BY seq_tup_read DESC
+"""
+
+
+@check("index_usage")
+def index_usage(conn: Connection, cfg: Config) -> CheckResult:
+    """Large tables that are mostly read with sequential scans."""
+    limits = cfg.index_usage
+    details = []
+    for r in conn.fetchall(SEQ_SCANS_SQL, (limits.min_rows,)):
+        ratio = r["idx_scan"] / (r["idx_scan"] + r["seq_scan"])
+        if ratio < limits.warn:
+            details.append(
+                f"{r['schemaname']}.{r['relname']}: {ratio:.0%} index scans over {r['rows']:,} rows"
+            )
+    if not details:
+        return CheckResult("index_usage", Status.OK, "large tables are read through indexes")
+    return CheckResult(
+        "index_usage", Status.WARN, plural(len(details), "table") + " mostly sequentially scanned", details
+    )
