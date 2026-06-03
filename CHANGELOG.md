@@ -51,3 +51,4 @@
 - considered cleanup logic; parked for now
 - follow up on docs example
 - double-check link checker behavior
+- follow up on config defaults
