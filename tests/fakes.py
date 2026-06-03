@@ -25,7 +25,7 @@ def healthy() -> dict[str, list[dict[str, Any]]]:
     from pgpulse.checks.bloat import DEAD_TUPLES_SQL
     from pgpulse.checks.cache import CACHE_HIT_SQL
     from pgpulse.checks.connections import CONNECTIONS_SQL
-    from pgpulse.checks.indexes import INVALID_INDEXES_SQL, UNUSED_INDEXES_SQL
+    from pgpulse.checks.indexes import DUPLICATE_INDEXES_SQL, INVALID_INDEXES_SQL, UNUSED_INDEXES_SQL
     from pgpulse.checks.locks import BLOCKED_SQL
     from pgpulse.checks.queries import IDLE_IN_TRANSACTION_SQL, LONG_QUERIES_SQL
     from pgpulse.checks.vacuum import STALE_VACUUM_SQL, XID_AGE_SQL
@@ -37,6 +37,7 @@ def healthy() -> dict[str, list[dict[str, Any]]]:
         IDLE_IN_TRANSACTION_SQL: [],
         UNUSED_INDEXES_SQL: [],
         INVALID_INDEXES_SQL: [],
+        DUPLICATE_INDEXES_SQL: [],
         DEAD_TUPLES_SQL: [],
         BLOCKED_SQL: [],
         STALE_VACUUM_SQL: [],

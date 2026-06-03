@@ -48,3 +48,29 @@ def invalid_indexes(conn: Connection, cfg: Config) -> CheckResult:
     return CheckResult(
         "invalid_indexes", Status.FAIL, plural(len(rows), "invalid index", "invalid indexes"), details
     )
+
+
+DUPLICATE_INDEXES_SQL = """
+SELECT n.nspname AS schemaname, t.relname, array_agg(c.relname ORDER BY c.relname) AS indexes
+FROM pg_index i
+JOIN pg_class c ON c.oid = i.indexrelid
+JOIN pg_class t ON t.oid = i.indrelid
+JOIN pg_namespace n ON n.oid = t.relnamespace
+WHERE n.nspname NOT IN ('pg_catalog', 'information_schema', 'pg_toast')
+GROUP BY n.nspname, t.relname, i.indkey::text, i.indclass::text,
+         coalesce(pg_get_expr(i.indexprs, i.indrelid), ''),
+         coalesce(pg_get_expr(i.indpred, i.indrelid), '')
+HAVING count(*) > 1
+"""
+
+
+@check("duplicate_indexes")
+def duplicate_indexes(conn: Connection, cfg: Config) -> CheckResult:
+    """Indexes that cover exactly the same columns as another index."""
+    rows = conn.fetchall(DUPLICATE_INDEXES_SQL)
+    if not rows:
+        return CheckResult("duplicate_indexes", Status.OK, "no duplicate indexes")
+    details = [f"{r['schemaname']}.{r['relname']}: {', '.join(r['indexes'])}" for r in rows]
+    return CheckResult(
+        "duplicate_indexes", Status.WARN, plural(len(rows), "set") + " of duplicate indexes", details
+    )

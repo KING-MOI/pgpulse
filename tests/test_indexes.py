@@ -46,3 +46,13 @@ def test_invalid_indexes_fail():
     )
     assert bad.status is Status.FAIL
     assert bad.details == ["public.orders_ccnew"]
+
+
+def test_duplicate_indexes_warn():
+    from pgpulse.checks.indexes import DUPLICATE_INDEXES_SQL, duplicate_indexes
+
+    rows = [{"schemaname": "public", "relname": "orders", "indexes": ["orders_a", "orders_a_copy"]}]
+    result = duplicate_indexes(FakeConnection({DUPLICATE_INDEXES_SQL: rows}), Config())
+    assert result.status is Status.WARN
+    assert result.summary == "1 set of duplicate indexes"
+    assert result.details == ["public.orders: orders_a, orders_a_copy"]
