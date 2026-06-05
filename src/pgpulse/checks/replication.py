@@ -35,3 +35,37 @@ def replication_lag(conn: Connection, cfg: Config) -> CheckResult:
         f"{plural(len(rows), 'standby', 'standbys')}, worst lag {worst:.1f}s",
         details,
     )
+
+
+SLOTS_SQL = """
+SELECT slot_name, slot_type, active,
+       pg_wal_lsn_diff(pg_current_wal_lsn(), restart_lsn)::bigint AS retained_bytes,
+       pg_size_pretty(pg_wal_lsn_diff(pg_current_wal_lsn(), restart_lsn)) AS retained
+FROM pg_replication_slots
+"""
+
+
+@check("replication_slots")
+def replication_slots(conn: Connection, cfg: Config) -> CheckResult:
+    """Inactive replication slots and the WAL they hold back."""
+    limits = cfg.replication_slots
+    rows = conn.fetchall(SLOTS_SQL)
+    status = Status.OK
+    details = []
+    for r in rows:
+        retained = r["retained_bytes"] or 0
+        if retained >= limits.fail_bytes:
+            status = Status.FAIL
+        elif not r["active"] or retained >= limits.warn_bytes:
+            status = max(status, Status.WARN)
+        else:
+            continue
+        state = "active" if r["active"] else "inactive"
+        details.append(
+            f"{r['slot_name']} ({r['slot_type']}, {state}) retains {r['retained'] or '0 bytes'} of WAL"
+        )
+    if not rows:
+        return CheckResult("replication_slots", Status.OK, "no replication slots")
+    return CheckResult(
+        "replication_slots", status, plural(len(rows), "slot") + f", {len(details)} need attention", details
+    )

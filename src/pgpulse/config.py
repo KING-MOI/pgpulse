@@ -71,6 +71,11 @@ class ReplicationLagConfig(Ascending):
     fail_seconds: float = 300
 
 
+class ReplicationSlotsConfig(Section):
+    warn_bytes: int = 1024**3
+    fail_bytes: int = 10 * 1024**3
+
+
 class UnusedIndexesConfig(Section):
     min_size_bytes: int = 1024 * 1024
 
@@ -99,6 +104,7 @@ class Config(Section):
     xid_wraparound: XidWraparoundConfig = XidWraparoundConfig()
     vacuum_age: VacuumAgeConfig = VacuumAgeConfig()
     replication_lag: ReplicationLagConfig = ReplicationLagConfig()
+    replication_slots: ReplicationSlotsConfig = ReplicationSlotsConfig()
 
 
 def load(path: Path) -> Config:

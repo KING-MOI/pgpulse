@@ -31,3 +31,38 @@ def test_far_behind_standby_fails():
     result = run(standby("a", 600.0), standby("b", 45.0))
     assert result.status is Status.FAIL
     assert result.summary == "2 standbys, worst lag 600.0s"
+
+
+GB = 1024**3
+
+
+def slot(name, active, retained):
+    return {
+        "slot_name": name,
+        "slot_type": "logical",
+        "active": active,
+        "retained_bytes": retained,
+        "retained": "x",
+    }
+
+
+def run_slots(*rows):
+    from pgpulse.checks.replication import SLOTS_SQL, replication_slots
+
+    return replication_slots(FakeConnection({SLOTS_SQL: list(rows)}), Config())
+
+
+def test_active_slot_with_little_wal_is_ok():
+    result = run_slots(slot("cdc", True, 1024))
+    assert result.status is Status.OK
+    assert result.details == []
+
+
+def test_inactive_slot_warns():
+    result = run_slots(slot("cdc", False, 1024))
+    assert result.status is Status.WARN
+    assert "inactive" in result.details[0]
+
+
+def test_slot_holding_too_much_wal_fails():
+    assert run_slots(slot("cdc", True, 20 * GB)).status is Status.FAIL
