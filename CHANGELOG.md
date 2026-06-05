@@ -20,3 +20,4 @@
 - follow up on release checklist
 - double-check docs example behavior
 - edge case observed while testing
+- double-check release checklist behavior
