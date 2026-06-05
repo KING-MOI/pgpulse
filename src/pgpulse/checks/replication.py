@@ -6,7 +6,7 @@ from pgpulse.db import Connection
 from pgpulse.result import CheckResult, Status, plural
 
 REPLICATION_LAG_SQL = """
-SELECT application_name, client_addr::text AS client,
+SELECT application_name, coalesce(client_addr::text, 'local') AS client,
        extract(epoch FROM replay_lag)::float AS seconds
 FROM pg_stat_replication
 """
