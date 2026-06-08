@@ -38,10 +38,13 @@ def replication_lag(conn: Connection, cfg: Config) -> CheckResult:
 
 
 SLOTS_SQL = """
+WITH pos AS (
+    SELECT CASE WHEN pg_is_in_recovery() THEN pg_last_wal_replay_lsn() ELSE pg_current_wal_lsn() END AS lsn
+)
 SELECT slot_name, slot_type, active,
-       pg_wal_lsn_diff(pg_current_wal_lsn(), restart_lsn)::bigint AS retained_bytes,
-       pg_size_pretty(pg_wal_lsn_diff(pg_current_wal_lsn(), restart_lsn)) AS retained
-FROM pg_replication_slots
+       pg_wal_lsn_diff(pos.lsn, restart_lsn)::bigint AS retained_bytes,
+       pg_size_pretty(pg_wal_lsn_diff(pos.lsn, restart_lsn)) AS retained
+FROM pg_replication_slots, pos
 """
 
 
