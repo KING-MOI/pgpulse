@@ -34,4 +34,10 @@ def test_report_ends_with_status_counts():
     text = output(
         [CheckResult("a", Status.OK, ""), CheckResult("b", Status.OK, ""), CheckResult("c", Status.FAIL, "")]
     )
-    assert text.strip().splitlines()[-1] == "2 ok, 0 warn, 1 fail, 0 error"
+    assert text.strip().splitlines()[-1] == "2 ok, 1 fail"
+
+
+def test_skipped_checks_are_dimmed_not_failed():
+    text = output([CheckResult("a", Status.SKIP, "not on standby")])
+    assert "SKIP" in text
+    assert text.strip().splitlines()[-1] == "1 skip"

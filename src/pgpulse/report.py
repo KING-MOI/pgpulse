@@ -10,6 +10,7 @@ from rich.table import Table
 from pgpulse.result import CheckResult, Status
 
 STYLES = {
+    Status.SKIP: "dim",
     Status.OK: "bold green",
     Status.WARN: "bold yellow",
     Status.FAIL: "bold red",
@@ -29,7 +30,7 @@ def render(results: list[CheckResult], console: Console) -> None:
         for line in r.details:
             console.print(f"  [{STYLES[r.status]}]{r.name}[/] {line}")
     counts = Counter(r.status for r in results)
-    console.print(", ".join(f"[{STYLES[s]}]{counts[s]} {s.name.lower()}[/]" for s in Status))
+    console.print(", ".join(f"[{STYLES[s]}]{counts[s]} {s.name.lower()}[/]" for s in Status if counts[s]))
 
 
 def to_json(results: list[CheckResult]) -> str:

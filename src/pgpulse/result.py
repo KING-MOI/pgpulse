@@ -5,6 +5,7 @@ from enum import IntEnum
 
 
 class Status(IntEnum):
+    SKIP = -1
     OK = 0
     WARN = 1
     FAIL = 2
