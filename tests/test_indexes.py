@@ -2,9 +2,12 @@ from fakes import FakeConnection
 
 from pgpulse.checks.indexes import UNUSED_INDEXES_SQL, unused_indexes
 from pgpulse.config import Config
+from pgpulse.db import RECOVERY_SQL
 from pgpulse.result import Status
 
 MB = 1024 * 1024
+PRIMARY = [{"in_recovery": False}]
+STANDBY = [{"in_recovery": True}]
 
 
 def idx(name, size):
@@ -18,7 +21,7 @@ def idx(name, size):
 
 
 def run(*rows):
-    return unused_indexes(FakeConnection({UNUSED_INDEXES_SQL: list(rows)}), Config())
+    return unused_indexes(FakeConnection({RECOVERY_SQL: PRIMARY, UNUSED_INDEXES_SQL: list(rows)}), Config())
 
 
 def test_no_unused_indexes_is_ok():
@@ -65,7 +68,7 @@ def scans(seq, idx):
 def run_usage(*rows):
     from pgpulse.checks.indexes import SEQ_SCANS_SQL, index_usage
 
-    return index_usage(FakeConnection({SEQ_SCANS_SQL: list(rows)}), Config())
+    return index_usage(FakeConnection({RECOVERY_SQL: PRIMARY, SEQ_SCANS_SQL: list(rows)}), Config())
 
 
 def test_indexed_tables_are_ok():
@@ -76,3 +79,12 @@ def test_seq_scan_heavy_table_warns():
     result = run_usage(scans(90, 10))
     assert result.status is Status.WARN
     assert result.details == ["public.orders: 10% index scans over 50,000 rows"]
+
+
+def test_usage_checks_skip_on_standby():
+    from pgpulse.checks.indexes import index_usage
+
+    for fn in (unused_indexes, index_usage):
+        conn = FakeConnection({RECOVERY_SQL: STANDBY})
+        assert fn(conn, Config()).status is Status.SKIP
+        assert conn.queries == [RECOVERY_SQL]

@@ -2,7 +2,7 @@ from __future__ import annotations
 
 from pgpulse.checks import check
 from pgpulse.config import Config
-from pgpulse.db import Connection
+from pgpulse.db import Connection, in_recovery
 from pgpulse.result import CheckResult, Status, plural
 
 UNUSED_INDEXES_SQL = """
@@ -19,6 +19,8 @@ ORDER BY size_bytes DESC
 @check("unused_indexes")
 def unused_indexes(conn: Connection, cfg: Config) -> CheckResult:
     """Non-unique indexes that have never been scanned."""
+    if in_recovery(conn):
+        return CheckResult("unused_indexes", Status.SKIP, "scan counts on a standby only cover the standby")
     floor = cfg.unused_indexes.min_size_bytes
     rows = [r for r in conn.fetchall(UNUSED_INDEXES_SQL) if r["size_bytes"] >= floor]
     if not rows:
@@ -87,6 +89,8 @@ ORDER BY seq_tup_read DESC
 @check("index_usage")
 def index_usage(conn: Connection, cfg: Config) -> CheckResult:
     """Large tables that are mostly read with sequential scans."""
+    if in_recovery(conn):
+        return CheckResult("index_usage", Status.SKIP, "scan counts on a standby only cover the standby")
     limits = cfg.index_usage
     details = []
     for r in conn.fetchall(SEQ_SCANS_SQL, (limits.min_rows,)):

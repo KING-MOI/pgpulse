@@ -9,6 +9,13 @@ class Connection(Protocol):
     def close(self) -> None: ...
 
 
+RECOVERY_SQL = "SELECT pg_is_in_recovery() AS in_recovery"
+
+
+def in_recovery(conn: Connection) -> bool:
+    return bool(conn.fetchall(RECOVERY_SQL)[0]["in_recovery"])
+
+
 class PsycopgConnection:
     def __init__(self, dsn: str) -> None:
         import psycopg

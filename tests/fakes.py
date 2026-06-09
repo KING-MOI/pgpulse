@@ -35,8 +35,10 @@ def healthy() -> dict[str, list[dict[str, Any]]]:
     from pgpulse.checks.queries import IDLE_IN_TRANSACTION_SQL, LONG_QUERIES_SQL
     from pgpulse.checks.replication import REPLICATION_LAG_SQL, SLOTS_SQL
     from pgpulse.checks.vacuum import STALE_VACUUM_SQL, XID_AGE_SQL
+    from pgpulse.db import RECOVERY_SQL
 
     return {
+        RECOVERY_SQL: [{"in_recovery": False}],
         CACHE_HIT_SQL: [{"hit": 999.0, "read": 1.0}],
         CONNECTIONS_SQL: [{"used": 5, "max": 100}],
         LONG_QUERIES_SQL: [],
