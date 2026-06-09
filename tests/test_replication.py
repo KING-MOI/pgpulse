@@ -2,6 +2,7 @@ from fakes import FakeConnection
 
 from pgpulse.checks.replication import REPLICATION_LAG_SQL, replication_lag
 from pgpulse.config import Config
+from pgpulse.db import RECOVERY_SQL
 from pgpulse.result import Status
 
 
@@ -10,7 +11,8 @@ def standby(name, seconds):
 
 
 def run(*rows):
-    return replication_lag(FakeConnection({REPLICATION_LAG_SQL: list(rows)}), Config())
+    responses = {RECOVERY_SQL: [{"in_recovery": False}], REPLICATION_LAG_SQL: list(rows)}
+    return replication_lag(FakeConnection(responses), Config())
 
 
 def test_no_standbys_is_ok():
@@ -66,3 +68,12 @@ def test_inactive_slot_warns():
 
 def test_slot_holding_too_much_wal_fails():
     assert run_slots(slot("cdc", True, 20 * GB)).status is Status.FAIL
+
+
+def test_standby_reports_its_own_replay_lag():
+    from pgpulse.checks.replication import STANDBY_LAG_SQL
+
+    conn = FakeConnection({RECOVERY_SQL: [{"in_recovery": True}], STANDBY_LAG_SQL: [{"seconds": 90.0}]})
+    result = replication_lag(conn, Config())
+    assert result.status is Status.WARN
+    assert result.details == ["this standby (local): 90.0s behind"]

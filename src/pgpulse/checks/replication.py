@@ -2,7 +2,7 @@ from __future__ import annotations
 
 from pgpulse.checks import check
 from pgpulse.config import Config
-from pgpulse.db import Connection
+from pgpulse.db import Connection, in_recovery
 from pgpulse.result import CheckResult, Status, plural
 
 REPLICATION_LAG_SQL = """
@@ -11,12 +11,21 @@ SELECT application_name, coalesce(client_addr::text, 'local') AS client,
 FROM pg_stat_replication
 """
 
+STANDBY_LAG_SQL = """
+SELECT CASE WHEN pg_last_wal_receive_lsn() = pg_last_wal_replay_lsn() THEN 0
+            ELSE extract(epoch FROM now() - pg_last_xact_replay_timestamp())::float
+       END AS seconds
+"""
+
 
 @check("replication_lag")
 def replication_lag(conn: Connection, cfg: Config) -> CheckResult:
     """Replay lag of each standby attached to this primary."""
     limits = cfg.replication_lag
-    rows = conn.fetchall(REPLICATION_LAG_SQL)
+    if in_recovery(conn):
+        rows = [{"application_name": "this standby", "client": "local", **conn.fetchall(STANDBY_LAG_SQL)[0]}]
+    else:
+        rows = conn.fetchall(REPLICATION_LAG_SQL)
     if not rows:
         return CheckResult("replication_lag", Status.OK, "no standbys attached")
     status = Status.OK
