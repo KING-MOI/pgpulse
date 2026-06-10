@@ -76,6 +76,11 @@ class ReplicationSlotsConfig(Section):
     fail_bytes: int = 10 * 1024**3
 
 
+class SequencesConfig(Ascending):
+    warn: Ratio = 0.75
+    fail: Ratio = 0.9
+
+
 class UnusedIndexesConfig(Section):
     min_size_bytes: int = 1024 * 1024
 
@@ -105,6 +110,7 @@ class Config(Section):
     vacuum_age: VacuumAgeConfig = VacuumAgeConfig()
     replication_lag: ReplicationLagConfig = ReplicationLagConfig()
     replication_slots: ReplicationSlotsConfig = ReplicationSlotsConfig()
+    sequences: SequencesConfig = SequencesConfig()
 
 
 def load(path: Path) -> Config:
