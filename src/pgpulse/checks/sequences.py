@@ -6,9 +6,20 @@ from pgpulse.db import Connection
 from pgpulse.result import CheckResult, Status, plural
 
 SEQUENCES_SQL = """
-SELECT schemaname, sequencename, start_value, last_value, min_value, max_value, increment_by
-FROM pg_sequences
-WHERE last_value IS NOT NULL
+SELECT s.schemaname, s.sequencename, s.start_value, s.last_value, s.increment_by,
+       CASE a.atttypid WHEN 'int2'::regtype THEN greatest(s.min_value, -32768)
+                       WHEN 'int4'::regtype THEN greatest(s.min_value, -2147483648)
+                       ELSE s.min_value END AS min_value,
+       CASE a.atttypid WHEN 'int2'::regtype THEN least(s.max_value, 32767)
+                       WHEN 'int4'::regtype THEN least(s.max_value, 2147483647)
+                       ELSE s.max_value END AS max_value
+FROM pg_sequences s
+LEFT JOIN pg_depend d
+       ON d.classid = 'pg_class'::regclass AND d.refclassid = 'pg_class'::regclass
+      AND d.objid = format('%I.%I', s.schemaname, s.sequencename)::regclass
+      AND d.deptype IN ('a', 'i')
+LEFT JOIN pg_attribute a ON a.attrelid = d.refobjid AND a.attnum = d.refobjsubid
+WHERE s.last_value IS NOT NULL
 """
 
 
