@@ -35,6 +35,26 @@ List what is available:
 pgpulse --list-checks
 ```
 
+## Checks
+
+| check | what it looks at |
+|-------|------------------|
+| `cache_hit` | share of table reads served from shared buffers |
+| `connections` | client connections versus `max_connections` |
+| `long_queries` | active queries running past a time limit |
+| `idle_in_transaction` | sessions sitting in an open transaction |
+| `blocking_locks` | sessions stuck behind another session's lock |
+| `bloat` | tables with a high share of dead tuples |
+| `vacuum_age` | tables with dead tuples that vacuum has not reached |
+| `xid_wraparound` | transaction ID age per database |
+| `unused_indexes` | non-unique indexes with zero scans |
+| `invalid_indexes` | indexes left behind by a failed concurrent build |
+| `duplicate_indexes` | indexes with identical definitions |
+| `index_usage` | large tables read mostly by sequential scan |
+| `replication_lag` | replay lag of standbys, or of this standby |
+| `replication_slots` | inactive slots and the WAL they retain |
+| `sequences` | sequences close to their limit, including the column type |
+
 ## Exit codes
 
 | code | meaning |
