@@ -86,6 +86,15 @@ class DeadlocksConfig(Section):
     fail_per_day: float = 20
 
 
+class TempFilesConfig(Section):
+    warn_bytes_per_day: int = 10 * 1024**3
+
+
+class RollbacksConfig(Ascending):
+    warn: Ratio = 0.05
+    fail: Ratio = 0.2
+
+
 class UnusedIndexesConfig(Section):
     min_size_bytes: int = 1024 * 1024
 
@@ -117,6 +126,8 @@ class Config(Section):
     replication_slots: ReplicationSlotsConfig = ReplicationSlotsConfig()
     sequences: SequencesConfig = SequencesConfig()
     deadlocks: DeadlocksConfig = DeadlocksConfig()
+    temp_files: TempFilesConfig = TempFilesConfig()
+    rollbacks: RollbacksConfig = RollbacksConfig()
 
 
 def load(path: Path) -> Config:
