@@ -3,3 +3,4 @@
 - follow up on docs example
 - double-check cleanup logic behavior
 - follow up on docs example
+- double-check release checklist behavior
