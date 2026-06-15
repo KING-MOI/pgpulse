@@ -22,6 +22,7 @@ class FakeConnection:
 
 
 def healthy() -> dict[str, list[dict[str, Any]]]:
+    from pgpulse.checks.activity import DATABASE_STATS_SQL
     from pgpulse.checks.bloat import DEAD_TUPLES_SQL
     from pgpulse.checks.cache import CACHE_HIT_SQL
     from pgpulse.checks.connections import CONNECTIONS_SQL
@@ -53,6 +54,16 @@ def healthy() -> dict[str, list[dict[str, Any]]]:
         REPLICATION_LAG_SQL: [],
         SLOTS_SQL: [],
         SEQUENCES_SQL: [],
+        DATABASE_STATS_SQL: [
+            {
+                "deadlocks": 0,
+                "temp_files": 0,
+                "temp_bytes": 0,
+                "xact_commit": 1000,
+                "xact_rollback": 1,
+                "days": 10.0,
+            }
+        ],
         STALE_VACUUM_SQL: [],
         XID_AGE_SQL: [{"datname": "app", "age": 1_000_000}],
     }

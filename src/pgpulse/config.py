@@ -81,6 +81,11 @@ class SequencesConfig(Ascending):
     fail: Ratio = 0.9
 
 
+class DeadlocksConfig(Section):
+    warn_per_day: float = 1
+    fail_per_day: float = 20
+
+
 class UnusedIndexesConfig(Section):
     min_size_bytes: int = 1024 * 1024
 
@@ -111,6 +116,7 @@ class Config(Section):
     replication_lag: ReplicationLagConfig = ReplicationLagConfig()
     replication_slots: ReplicationSlotsConfig = ReplicationSlotsConfig()
     sequences: SequencesConfig = SequencesConfig()
+    deadlocks: DeadlocksConfig = DeadlocksConfig()
 
 
 def load(path: Path) -> Config:
