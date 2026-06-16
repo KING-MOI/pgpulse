@@ -7,7 +7,7 @@ from pgpulse.result import CheckResult, Status, plural
 
 DATABASE_STATS_SQL = """
 SELECT deadlocks, temp_files, temp_bytes, xact_commit, xact_rollback,
-       greatest(extract(epoch FROM now() - coalesce(stats_reset, pg_postmaster_start_time())) / 86400, 1.0 / 24)
+       greatest(extract(epoch FROM now() - coalesce(stats_reset, pg_postmaster_start_time())) / 86400, 1)
          AS days
 FROM pg_stat_database
 WHERE datname = current_database()
