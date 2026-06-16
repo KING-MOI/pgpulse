@@ -21,4 +21,4 @@ class CheckResult:
 
 
 def plural(n: int, one: str, many: str | None = None) -> str:
-    return f"{n} {one if n == 1 else many or one + 's'}"
+    return f"{n:,} {one if n == 1 else many or one + 's'}"
