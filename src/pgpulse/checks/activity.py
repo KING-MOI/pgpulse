@@ -71,8 +71,10 @@ def checkpoints(conn: Connection, cfg: Config) -> CheckResult:
     sql = CHECKPOINTS_17_SQL if server_version(conn) >= 170000 else CHECKPOINTS_SQL
     row = conn.fetchall(sql)[0]
     total = row["timed"] + row["requested"]
-    if total == 0:
-        return CheckResult("checkpoints", Status.OK, "no checkpoints yet")
+    if total < limits.min_checkpoints:
+        return CheckResult(
+            "checkpoints", Status.OK, f"only {plural(total, 'checkpoint')} so far, too few to judge"
+        )
     ratio = row["requested"] / total
     status = Status.WARN if ratio >= limits.warn else Status.OK
     return CheckResult("checkpoints", status, f"{ratio:.0%} of {plural(total, 'checkpoint')} were requested")

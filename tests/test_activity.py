@@ -80,5 +80,7 @@ def test_postgres_17_reads_pg_stat_checkpointer():
     assert run_checkpoints(170002, 10, 90).status is Status.WARN
 
 
-def test_fresh_cluster_has_no_checkpoints():
-    assert run_checkpoints(160004, 0, 0).summary == "no checkpoints yet"
+def test_few_checkpoints_are_not_judged():
+    result = run_checkpoints(160004, 1, 2)
+    assert result.status is Status.OK
+    assert result.summary == "only 3 checkpoints so far, too few to judge"

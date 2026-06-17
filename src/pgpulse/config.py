@@ -97,6 +97,7 @@ class RollbacksConfig(Ascending):
 
 class CheckpointsConfig(Section):
     warn: Ratio = 0.3
+    min_checkpoints: int = 10
 
 
 class UnusedIndexesConfig(Section):
