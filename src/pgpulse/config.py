@@ -95,6 +95,10 @@ class RollbacksConfig(Ascending):
     fail: Ratio = 0.2
 
 
+class CheckpointsConfig(Section):
+    warn: Ratio = 0.3
+
+
 class UnusedIndexesConfig(Section):
     min_size_bytes: int = 1024 * 1024
 
@@ -128,6 +132,7 @@ class Config(Section):
     deadlocks: DeadlocksConfig = DeadlocksConfig()
     temp_files: TempFilesConfig = TempFilesConfig()
     rollbacks: RollbacksConfig = RollbacksConfig()
+    checkpoints: CheckpointsConfig = CheckpointsConfig()
 
 
 def load(path: Path) -> Config:

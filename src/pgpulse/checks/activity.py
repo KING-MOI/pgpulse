@@ -2,7 +2,7 @@ from __future__ import annotations
 
 from pgpulse.checks import check
 from pgpulse.config import Config
-from pgpulse.db import Connection
+from pgpulse.db import Connection, server_version
 from pgpulse.result import CheckResult, Status, plural
 
 DATABASE_STATS_SQL = """
@@ -53,3 +53,26 @@ def rollbacks(conn: Connection, cfg: Config) -> CheckResult:
     elif ratio >= limits.warn:
         status = Status.WARN
     return CheckResult("rollbacks", status, f"{ratio:.1%} of {total:,} transactions rolled back")
+
+
+CHECKPOINTS_SQL = """
+SELECT checkpoints_timed AS timed, checkpoints_req AS requested FROM pg_stat_bgwriter
+"""
+
+CHECKPOINTS_17_SQL = """
+SELECT num_timed AS timed, num_requested AS requested FROM pg_stat_checkpointer
+"""
+
+
+@check("checkpoints")
+def checkpoints(conn: Connection, cfg: Config) -> CheckResult:
+    """Share of checkpoints forced by WAL volume rather than the timer."""
+    limits = cfg.checkpoints
+    sql = CHECKPOINTS_17_SQL if server_version(conn) >= 170000 else CHECKPOINTS_SQL
+    row = conn.fetchall(sql)[0]
+    total = row["timed"] + row["requested"]
+    if total == 0:
+        return CheckResult("checkpoints", Status.OK, "no checkpoints yet")
+    ratio = row["requested"] / total
+    status = Status.WARN if ratio >= limits.warn else Status.OK
+    return CheckResult("checkpoints", status, f"{ratio:.0%} of {plural(total, 'checkpoint')} were requested")

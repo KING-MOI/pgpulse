@@ -53,3 +53,32 @@ def test_rollbacks_with_no_transactions():
 
     result = rollbacks(stats(xact_commit=0, xact_rollback=0), Config())
     assert result.status is Status.OK
+
+
+def run_checkpoints(version, timed, requested):
+    from pgpulse.checks.activity import CHECKPOINTS_17_SQL, CHECKPOINTS_SQL, checkpoints
+    from pgpulse.db import VERSION_SQL
+
+    sql = CHECKPOINTS_17_SQL if version >= 170000 else CHECKPOINTS_SQL
+    conn = FakeConnection(
+        {VERSION_SQL: [{"version": version}], sql: [{"timed": timed, "requested": requested}]}
+    )
+    return checkpoints(conn, Config())
+
+
+def test_mostly_timed_checkpoints_are_ok():
+    assert run_checkpoints(160004, 90, 10).status is Status.OK
+
+
+def test_mostly_requested_checkpoints_warn():
+    result = run_checkpoints(160004, 10, 90)
+    assert result.status is Status.WARN
+    assert result.summary == "90% of 100 checkpoints were requested"
+
+
+def test_postgres_17_reads_pg_stat_checkpointer():
+    assert run_checkpoints(170002, 10, 90).status is Status.WARN
+
+
+def test_fresh_cluster_has_no_checkpoints():
+    assert run_checkpoints(160004, 0, 0).summary == "no checkpoints yet"

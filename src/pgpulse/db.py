@@ -16,6 +16,13 @@ def in_recovery(conn: Connection) -> bool:
     return bool(conn.fetchall(RECOVERY_SQL)[0]["in_recovery"])
 
 
+VERSION_SQL = "SELECT current_setting('server_version_num')::int AS version"
+
+
+def server_version(conn: Connection) -> int:
+    return int(conn.fetchall(VERSION_SQL)[0]["version"])
+
+
 class PsycopgConnection:
     def __init__(self, dsn: str) -> None:
         import psycopg
