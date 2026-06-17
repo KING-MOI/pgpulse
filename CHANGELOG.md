@@ -8,3 +8,4 @@
 - double-check config defaults behavior
 - follow up on ci caching
 - considered docs example; parked for now
+- double-check cleanup logic behavior
