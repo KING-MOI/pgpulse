@@ -24,7 +24,12 @@ def build_parser() -> argparse.ArgumentParser:
         help="libpq connection string or URI (default: $PGPULSE_DSN, then libpq PG* variables)",
     )
     parser.add_argument(
-        "-c", "--check", action="append", choices=sorted(REGISTRY), help="run only this check (repeatable)"
+        "-c",
+        "--check",
+        action="append",
+        choices=sorted(REGISTRY),
+        metavar="NAME",
+        help="run only this check (repeatable)",
     )
     parser.add_argument("--format", choices=["table", "json"], default="table", help="output format")
     parser.add_argument(
