@@ -1,5 +1,7 @@
 from __future__ import annotations
 
+import importlib
+import pkgutil
 from collections.abc import Callable
 
 from pgpulse.config import Config
@@ -19,16 +21,5 @@ def check(name: str) -> Callable[[CheckFn], CheckFn]:
     return register
 
 
-from pgpulse.checks import (  # noqa: E402, F401
-    activity,
-    bloat,
-    cache,
-    connections,
-    indexes,
-    locks,
-    queries,
-    replication,
-    schema,
-    sequences,
-    vacuum,
-)
+for _module in pkgutil.iter_modules(__path__):
+    importlib.import_module(f"{__name__}.{_module.name}")
