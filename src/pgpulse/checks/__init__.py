@@ -28,6 +28,7 @@ from pgpulse.checks import (  # noqa: E402, F401
     locks,
     queries,
     replication,
+    schema,
     sequences,
     vacuum,
 )
