@@ -17,3 +17,10 @@ def test_crashing_check_becomes_error_result():
     results = run_checks(FakeConnection(), Config(), ["cache_hit", "connections"])
     assert [r.status for r in results] == [Status.ERROR, Status.ERROR]
     assert results[0].summary.startswith("AssertionError")
+
+
+def test_every_check_passes_against_a_healthy_database():
+    from fakes import healthy
+
+    results = run_checks(FakeConnection(healthy()), Config())
+    assert {r.name: r.status for r in results if r.status is not Status.OK} == {}
