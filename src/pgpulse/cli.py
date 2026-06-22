@@ -31,6 +31,15 @@ def build_parser() -> argparse.ArgumentParser:
         metavar="NAME",
         help="run only this check (repeatable)",
     )
+    parser.add_argument(
+        "-x",
+        "--exclude",
+        action="append",
+        default=[],
+        choices=sorted(REGISTRY),
+        metavar="NAME",
+        help="skip this check (repeatable)",
+    )
     parser.add_argument("--format", choices=["table", "json"], default="table", help="output format")
     parser.add_argument(
         "--fail-on",
@@ -63,7 +72,8 @@ def main(argv: list[str] | None = None, connect: Callable[[str], Connection] = P
         Console(stderr=True).print(f"[bold red]cannot connect:[/] {exc}")
         return 3
     try:
-        results = run_checks(conn, cfg, args.check)
+        names = [n for n in args.check or REGISTRY if n not in args.exclude]
+        results = run_checks(conn, cfg, names)
     finally:
         conn.close()
     if args.format == "json":

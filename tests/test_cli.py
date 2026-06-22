@@ -100,3 +100,12 @@ def test_fail_on_warn_turns_warnings_into_failures():
     responses[CONNECTIONS_SQL] = [{"used": 85, "max": 100}]
     assert main([], connect=connector(responses)) == 0
     assert main(["--fail-on", "warn"], connect=connector(responses)) == 1
+
+
+def test_exclude_flag_drops_checks(capsys):
+    main(["--format", "json", "-x", "bloat", "-x", "cache_hit"], connect=connector(healthy()))
+    import json
+
+    names = {d["name"] for d in json.loads(capsys.readouterr().out)}
+    assert "bloat" not in names and "cache_hit" not in names
+    assert "connections" in names
