@@ -10,7 +10,7 @@ from pgpulse.result import CheckResult, Status
 
 def run_checks(conn: Connection, cfg: Config, names: Iterable[str] | None = None) -> list[CheckResult]:
     results = []
-    for name in names or REGISTRY:
+    for name in REGISTRY if names is None else names:
         try:
             results.append(REGISTRY[name](conn, cfg))
         except Exception as exc:

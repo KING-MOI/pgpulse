@@ -24,3 +24,7 @@ def test_every_check_passes_against_a_healthy_database():
 
     results = run_checks(FakeConnection(healthy()), Config())
     assert {r.name: r.status for r in results if r.status is not Status.OK} == {}
+
+
+def test_empty_selection_runs_nothing():
+    assert run_checks(FakeConnection(), Config(), []) == []
