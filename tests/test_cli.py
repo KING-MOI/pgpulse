@@ -109,3 +109,10 @@ def test_exclude_flag_drops_checks(capsys):
     names = {d["name"] for d in json.loads(capsys.readouterr().out)}
     assert "bloat" not in names and "cache_hit" not in names
     assert "connections" in names
+
+
+def test_excluding_everything_is_a_usage_error(capsys):
+    connect = connector(healthy())
+    assert main(["-c", "bloat", "-x", "bloat"], connect=connect) == 2
+    assert connect.conns == []
+    assert "no checks selected" in capsys.readouterr().err

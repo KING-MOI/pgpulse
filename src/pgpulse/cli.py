@@ -66,13 +66,16 @@ def main(argv: list[str] | None = None, connect: Callable[[str], Connection] = P
         return 2
     if args.dsn:
         cfg.dsn = args.dsn
+    names = [n for n in args.check or REGISTRY if n not in args.exclude]
+    if not names:
+        Console(stderr=True).print("[bold red]no checks selected[/]")
+        return 2
     try:
         conn = connect(cfg.dsn or "")
     except ConnectionError as exc:
         Console(stderr=True).print(f"[bold red]cannot connect:[/] {exc}")
         return 3
     try:
-        names = [n for n in args.check or REGISTRY if n not in args.exclude]
         results = run_checks(conn, cfg, names)
     finally:
         conn.close()
