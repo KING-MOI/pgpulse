@@ -116,3 +116,12 @@ def test_excluding_everything_is_a_usage_error(capsys):
     assert main(["-c", "bloat", "-x", "bloat"], connect=connect) == 2
     assert connect.conns == []
     assert "no checks selected" in capsys.readouterr().err
+
+
+def test_config_can_exclude_checks(tmp_path, capsys):
+    import json
+
+    path = tmp_path / "pgpulse.toml"
+    path.write_text('exclude = ["primary_keys"]\n')
+    main(["--config", str(path), "--format", "json"], connect=connector(healthy()))
+    assert "primary_keys" not in {d["name"] for d in json.loads(capsys.readouterr().out)}

@@ -117,6 +117,7 @@ class BloatConfig(Ascending):
 
 class Config(Section):
     dsn: str | None = None
+    exclude: list[str] = []
     cache_hit: CacheHitConfig = CacheHitConfig()
     connections: ConnectionsConfig = ConnectionsConfig()
     long_queries: LongQueriesConfig = LongQueriesConfig()

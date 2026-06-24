@@ -66,7 +66,7 @@ def main(argv: list[str] | None = None, connect: Callable[[str], Connection] = P
         return 2
     if args.dsn:
         cfg.dsn = args.dsn
-    names = [n for n in args.check or REGISTRY if n not in args.exclude]
+    names = [n for n in args.check or REGISTRY if n not in args.exclude + cfg.exclude]
     if not names:
         Console(stderr=True).print("[bold red]no checks selected[/]")
         return 2
