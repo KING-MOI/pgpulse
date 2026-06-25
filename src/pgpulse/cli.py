@@ -66,6 +66,12 @@ def main(argv: list[str] | None = None, connect: Callable[[str], Connection] = P
         return 2
     if args.dsn:
         cfg.dsn = args.dsn
+    unknown = sorted(set(cfg.exclude) - set(REGISTRY))
+    if unknown:
+        Console(stderr=True).print(
+            f"[bold red]bad config:[/] unknown checks in exclude: {', '.join(unknown)}"
+        )
+        return 2
     names = [n for n in args.check or REGISTRY if n not in args.exclude + cfg.exclude]
     if not names:
         Console(stderr=True).print("[bold red]no checks selected[/]")

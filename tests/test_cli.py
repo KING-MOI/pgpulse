@@ -125,3 +125,10 @@ def test_config_can_exclude_checks(tmp_path, capsys):
     path.write_text('exclude = ["primary_keys"]\n')
     main(["--config", str(path), "--format", "json"], connect=connector(healthy()))
     assert "primary_keys" not in {d["name"] for d in json.loads(capsys.readouterr().out)}
+
+
+def test_config_exclude_rejects_unknown_checks(tmp_path, capsys):
+    path = tmp_path / "pgpulse.toml"
+    path.write_text('exclude = ["primary_key"]\n')
+    assert main(["--config", str(path)], connect=connector(healthy())) == 2
+    assert "primary_key" in capsys.readouterr().err
