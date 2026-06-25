@@ -8,6 +8,7 @@ from pathlib import Path
 
 from rich.console import Console
 
+from pgpulse import __version__
 from pgpulse.checks import REGISTRY
 from pgpulse.config import Config, load
 from pgpulse.db import Connection, PsycopgConnection
@@ -48,6 +49,7 @@ def build_parser() -> argparse.ArgumentParser:
         help="lowest status that makes the exit code non-zero",
     )
     parser.add_argument("--config", type=Path, help="path to a pgpulse.toml file")
+    parser.add_argument("--version", action="version", version=f"%(prog)s {__version__}")
     parser.add_argument("--list-checks", action="store_true", help="list available checks and exit")
     return parser
 
