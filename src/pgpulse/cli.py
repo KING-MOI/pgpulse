@@ -49,6 +49,9 @@ def build_parser() -> argparse.ArgumentParser:
         help="lowest status that makes the exit code non-zero",
     )
     parser.add_argument("--config", type=Path, help="path to a pgpulse.toml file")
+    parser.add_argument(
+        "--no-color", action="store_true", help="disable colored output (NO_COLOR is honored too)"
+    )
     parser.add_argument("--version", action="version", version=f"%(prog)s {__version__}")
     parser.add_argument("--list-checks", action="store_true", help="list available checks and exit")
     return parser
@@ -56,7 +59,7 @@ def build_parser() -> argparse.ArgumentParser:
 
 def main(argv: list[str] | None = None, connect: Callable[[str], Connection] = PsycopgConnection) -> int:
     args = build_parser().parse_args(argv)
-    console = Console()
+    console = Console(no_color=args.no_color or None)
     if args.list_checks:
         for name, fn in REGISTRY.items():
             console.print(f"[bold]{name}[/]  {fn.__doc__ or ''}")
