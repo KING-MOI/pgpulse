@@ -28,3 +28,13 @@ def test_every_check_passes_against_a_healthy_database():
 
 def test_empty_selection_runs_nothing():
     assert run_checks(FakeConnection(), Config(), []) == []
+
+
+def test_each_result_records_its_duration(monkeypatch):
+    import pgpulse.runner
+
+    ticks = iter([10.0, 10.25])
+    monkeypatch.setattr(pgpulse.runner.time, "perf_counter", lambda: next(ticks))
+    conn = FakeConnection({CACHE_HIT_SQL: [{"hit": 99.0, "read": 1.0}]})
+    [result] = run_checks(conn, Config(), ["cache_hit"])
+    assert result.seconds == 0.25

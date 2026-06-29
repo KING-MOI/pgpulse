@@ -18,6 +18,7 @@ class CheckResult:
     status: Status
     summary: str
     details: list[str] = field(default_factory=list)
+    seconds: float = 0.0
 
 
 def plural(n: int, one: str, many: str | None = None) -> str:

@@ -1,5 +1,6 @@
 from __future__ import annotations
 
+import time
 from collections.abc import Iterable
 
 from pgpulse.checks import REGISTRY
@@ -11,8 +12,11 @@ from pgpulse.result import CheckResult, Status
 def run_checks(conn: Connection, cfg: Config, names: Iterable[str] | None = None) -> list[CheckResult]:
     results = []
     for name in REGISTRY if names is None else names:
+        started = time.perf_counter()
         try:
-            results.append(REGISTRY[name](conn, cfg))
+            result = REGISTRY[name](conn, cfg)
         except Exception as exc:
-            results.append(CheckResult(name, Status.ERROR, f"{type(exc).__name__}: {exc}"))
+            result = CheckResult(name, Status.ERROR, f"{type(exc).__name__}: {exc}")
+        result.seconds = time.perf_counter() - started
+        results.append(result)
     return results
