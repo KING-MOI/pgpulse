@@ -23,8 +23,11 @@ def render(results: list[CheckResult], console: Console) -> None:
     table.add_column("status")
     table.add_column("check")
     table.add_column("summary")
+    table.add_column("time", justify="right", style="dim")
     for r in results:
-        table.add_row(f"[{STYLES[r.status]}]{r.status.name}[/]", r.name, r.summary)
+        table.add_row(
+            f"[{STYLES[r.status]}]{r.status.name}[/]", r.name, r.summary, f"{r.seconds * 1000:.0f}ms"
+        )
     console.print(table)
     for r in results:
         for line in r.details:

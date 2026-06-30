@@ -43,3 +43,8 @@ def test_skipped_checks_are_dimmed_not_failed():
     text = output([CheckResult("a", Status.SKIP, "not on standby")])
     assert "SKIP" in text
     assert text.strip().splitlines()[-1] == "1 skip"
+
+
+def test_report_shows_check_duration():
+    text = output([CheckResult("bloat", Status.OK, "fine", seconds=0.0123)])
+    assert "12ms" in text
