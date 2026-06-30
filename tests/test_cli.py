@@ -132,3 +132,10 @@ def test_config_exclude_rejects_unknown_checks(tmp_path, capsys):
     path.write_text('exclude = ["primary_key"]\n')
     assert main(["--config", str(path)], connect=connector(healthy())) == 2
     assert "primary_key" in capsys.readouterr().err
+
+
+def test_malformed_dsn_exits_two(capsys):
+    from pgpulse.db import PsycopgConnection
+
+    assert main(["--dsn", "garbage"], connect=PsycopgConnection) == 2
+    assert "invalid dsn" in capsys.readouterr().err

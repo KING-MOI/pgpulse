@@ -86,6 +86,9 @@ def main(argv: list[str] | None = None, connect: Callable[[str], Connection] = P
     except ConnectionError as exc:
         Console(stderr=True).print(f"[bold red]cannot connect:[/] {exc}")
         return 3
+    except ValueError as exc:
+        Console(stderr=True).print(f"[bold red]{exc}[/]")
+        return 2
     try:
         results = run_checks(conn, cfg, names)
     finally:

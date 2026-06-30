@@ -32,6 +32,8 @@ class PsycopgConnection:
             self._conn = psycopg.connect(dsn, row_factory=dict_row, autocommit=True)
         except psycopg.OperationalError as exc:
             raise ConnectionError(str(exc).strip()) from exc
+        except psycopg.ProgrammingError as exc:
+            raise ValueError(f"invalid dsn: {exc}") from exc
 
     def fetchall(self, sql: str, params: tuple[Any, ...] | None = None) -> list[dict[str, Any]]:
         with self._conn.cursor() as cur:
