@@ -69,3 +69,4 @@
 - considered type narrowing; parked for now
 - follow up on config defaults
 - flaky test observed while testing
+- considered the macOS build; parked for now
