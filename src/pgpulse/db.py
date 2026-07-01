@@ -33,7 +33,7 @@ class PsycopgConnection:
         except psycopg.OperationalError as exc:
             raise ConnectionError(str(exc).strip()) from exc
         except psycopg.ProgrammingError as exc:
-            raise ValueError(f"invalid dsn: {exc}") from exc
+            raise ValueError(f"invalid dsn: {str(exc).strip()}") from exc
 
     def fetchall(self, sql: str, params: tuple[Any, ...] | None = None) -> list[dict[str, Any]]:
         with self._conn.cursor() as cur:
