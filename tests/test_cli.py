@@ -7,9 +7,9 @@ from pgpulse.cli import main
 def connector(responses):
     conns = []
 
-    def connect(dsn):
+    def connect(cfg):
         conn = FakeConnection(responses)
-        conn.dsn = dsn
+        conn.dsn = cfg.dsn
         conns.append(conn)
         return conn
 
@@ -36,7 +36,7 @@ def test_connection_is_closed_and_gets_dsn():
 
 
 def test_connection_failure_exits_three(capsys):
-    def refuse(dsn):
+    def refuse(cfg):
         raise ConnectionError("connection refused")
 
     assert main([], connect=refuse) == 3
@@ -52,7 +52,7 @@ def test_check_flag_limits_checks(capsys):
 
 
 def test_list_checks_does_not_connect(capsys):
-    def explode(dsn):
+    def explode(cfg):
         raise AssertionError("should not connect")
 
     assert main(["--list-checks"], connect=explode) == 0
@@ -135,7 +135,5 @@ def test_config_exclude_rejects_unknown_checks(tmp_path, capsys):
 
 
 def test_malformed_dsn_exits_two(capsys):
-    from pgpulse.db import PsycopgConnection
-
-    assert main(["--dsn", "garbage"], connect=PsycopgConnection) == 2
+    assert main(["--dsn", "garbage"]) == 2
     assert "invalid dsn" in capsys.readouterr().err

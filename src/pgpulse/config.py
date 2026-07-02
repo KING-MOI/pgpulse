@@ -117,6 +117,8 @@ class BloatConfig(Ascending):
 
 class Config(Section):
     dsn: str | None = None
+    connect_timeout: int = Field(10, gt=0)
+    statement_timeout_ms: int = Field(10_000, ge=0)
     exclude: list[str] = []
     cache_hit: CacheHitConfig = CacheHitConfig()
     connections: ConnectionsConfig = ConnectionsConfig()

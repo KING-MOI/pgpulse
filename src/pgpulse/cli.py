@@ -11,7 +11,8 @@ from rich.console import Console
 from pgpulse import __version__
 from pgpulse.checks import REGISTRY
 from pgpulse.config import Config, load
-from pgpulse.db import Connection, PsycopgConnection
+from pgpulse.db import Connection
+from pgpulse.db import connect as connect_db
 from pgpulse.report import render, to_json
 from pgpulse.result import Status
 from pgpulse.runner import run_checks
@@ -57,7 +58,7 @@ def build_parser() -> argparse.ArgumentParser:
     return parser
 
 
-def main(argv: list[str] | None = None, connect: Callable[[str], Connection] = PsycopgConnection) -> int:
+def main(argv: list[str] | None = None, connect: Callable[[Config], Connection] = connect_db) -> int:
     args = build_parser().parse_args(argv)
     console = Console(no_color=args.no_color or None)
     if args.list_checks:
@@ -82,7 +83,7 @@ def main(argv: list[str] | None = None, connect: Callable[[str], Connection] = P
         Console(stderr=True).print("[bold red]no checks selected[/]")
         return 2
     try:
-        conn = connect(cfg.dsn or "")
+        conn = connect(cfg)
     except ConnectionError as exc:
         Console(stderr=True).print(f"[bold red]cannot connect:[/] {exc}")
         return 3
