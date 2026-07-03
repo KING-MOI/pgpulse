@@ -47,3 +47,4 @@
 - slow start observed while testing
 - considered release checklist; parked for now
 - cache miss observed while testing
+- considered exit codes; parked for now
