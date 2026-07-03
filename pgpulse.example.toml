@@ -1,0 +1,73 @@
+dsn = "postgresql://pgpulse@localhost/app"
+
+connect_timeout = 10
+statement_timeout_ms = 10_000
+exclude = []
+
+[cache_hit]
+warn = 0.99
+fail = 0.95
+
+[connections]
+warn = 0.8
+fail = 0.95
+
+[long_queries]
+warn_seconds = 60
+fail_seconds = 300
+
+[idle_in_transaction]
+warn_seconds = 30
+fail_seconds = 300
+
+[blocking_locks]
+warn_seconds = 10
+fail_seconds = 120
+
+[unused_indexes]
+min_size_bytes = 1_048_576
+
+[index_usage]
+warn = 0.5
+min_rows = 10000
+
+[bloat]
+warn = 0.2
+fail = 0.5
+min_rows = 10000
+
+[xid_wraparound]
+warn = 0.5
+fail = 0.75
+
+[vacuum_age]
+warn_days = 7
+fail_days = 30
+min_dead_rows = 10000
+
+[replication_lag]
+warn_seconds = 30
+fail_seconds = 300
+
+[replication_slots]
+warn_bytes = 1_073_741_824
+fail_bytes = 10_737_418_240
+
+[sequences]
+warn = 0.75
+fail = 0.9
+
+[deadlocks]
+warn_per_day = 1
+fail_per_day = 20
+
+[temp_files]
+warn_bytes_per_day = 10_737_418_240
+
+[rollbacks]
+warn = 0.05
+fail = 0.2
+
+[checkpoints]
+warn = 0.3
+min_checkpoints = 10
