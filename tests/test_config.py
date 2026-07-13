@@ -42,3 +42,10 @@ def test_thresholds_must_be_ordered():
         Config.model_validate({"cache_hit": {"warn": 0.9, "fail": 0.95}})
     with pytest.raises(ValidationError, match="fail_seconds"):
         Config.model_validate({"long_queries": {"warn_seconds": 600}})
+
+
+def test_example_config_matches_defaults():
+    from pathlib import Path
+
+    example = load(Path(__file__).parent.parent / "pgpulse.example.toml")
+    assert example.model_dump(exclude={"dsn"}) == Config().model_dump(exclude={"dsn"})
