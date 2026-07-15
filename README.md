@@ -35,6 +35,32 @@ List what is available:
 pgpulse --list-checks
 ```
 
+## Configuration
+
+Thresholds live in a TOML file. Every key is optional; anything left out
+keeps its default. [`pgpulse.example.toml`](pgpulse.example.toml) lists all
+of them.
+
+```toml
+dsn = "postgresql://pgpulse@db.internal/app"
+exclude = ["primary_keys"]
+
+[cache_hit]
+warn = 0.98
+fail = 0.9
+
+[long_queries]
+warn_seconds = 120
+```
+
+```sh
+pgpulse --config pgpulse.toml
+```
+
+Unknown keys are rejected, so a typo fails loudly instead of being ignored.
+Each check also runs under a `statement_timeout` (10s by default) so a
+struggling server cannot hang the report.
+
 ## Checks
 
 | check | what it looks at |
