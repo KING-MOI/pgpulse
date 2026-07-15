@@ -38,10 +38,11 @@ def healthy() -> dict[str, list[dict[str, Any]]]:
     from pgpulse.checks.schema import NO_PRIMARY_KEY_SQL
     from pgpulse.checks.sequences import SEQUENCES_SQL
     from pgpulse.checks.vacuum import STALE_VACUUM_SQL, XID_AGE_SQL
-    from pgpulse.db import RECOVERY_SQL, VERSION_SQL
+    from pgpulse.db import RECOVERY_SQL, SERVER_SQL, VERSION_SQL
 
     return {
         RECOVERY_SQL: [{"in_recovery": False}],
+        SERVER_SQL: [{"database": "app", "host": "10.0.0.5", "version": "16.4", "in_recovery": False}],
         VERSION_SQL: [{"version": 160004}],
         CHECKPOINTS_SQL: [{"timed": 100, "requested": 2}],
         CACHE_HIT_SQL: [{"hit": 999.0, "read": 1.0}],

@@ -18,8 +18,9 @@ STYLES = {
 }
 
 
-def render(results: list[CheckResult], console: Console) -> None:
-    table = Table(title="pgpulse")
+def render(results: list[CheckResult], console: Console, title: str = "pgpulse") -> None:
+    console.print(f"[bold]{title}[/]")
+    table = Table()
     table.add_column("status")
     table.add_column("check")
     table.add_column("summary")

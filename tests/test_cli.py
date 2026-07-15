@@ -19,7 +19,9 @@ def connector(responses):
 
 def test_healthy_database_exits_zero(capsys):
     assert main([], connect=connector(healthy())) == 0
-    assert "cache_hit" in capsys.readouterr().out
+    out = capsys.readouterr().out
+    assert "cache_hit" in out
+    assert "app on 10.0.0.5 (PostgreSQL 16.4, primary)" in out
 
 
 def test_failing_check_exits_one():

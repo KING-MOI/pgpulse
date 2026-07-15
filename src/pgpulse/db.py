@@ -25,6 +25,20 @@ def server_version(conn: Connection) -> int:
     return int(conn.fetchall(VERSION_SQL)[0]["version"])
 
 
+SERVER_SQL = """
+SELECT current_database() AS database,
+       coalesce(host(inet_server_addr()), 'local socket') AS host,
+       split_part(version(), ' ', 2) AS version,
+       pg_is_in_recovery() AS in_recovery
+"""
+
+
+def describe(conn: Connection) -> str:
+    row = conn.fetchall(SERVER_SQL)[0]
+    role = "standby" if row["in_recovery"] else "primary"
+    return f"{row['database']} on {row['host']} (PostgreSQL {row['version']}, {role})"
+
+
 class PsycopgConnection:
     def __init__(self, dsn: str, statement_timeout_ms: int = 10_000, connect_timeout: int = 10) -> None:
         import psycopg

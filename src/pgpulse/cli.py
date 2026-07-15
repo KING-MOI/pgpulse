@@ -11,7 +11,7 @@ from rich.console import Console
 from pgpulse import __version__
 from pgpulse.checks import REGISTRY
 from pgpulse.config import Config, load
-from pgpulse.db import Connection
+from pgpulse.db import Connection, describe
 from pgpulse.db import connect as connect_db
 from pgpulse.report import render, to_json
 from pgpulse.result import Status
@@ -91,13 +91,14 @@ def main(argv: list[str] | None = None, connect: Callable[[Config], Connection] 
         Console(stderr=True).print(f"[bold red]{exc}[/]")
         return 2
     try:
+        target = describe(conn)
         results = run_checks(conn, cfg, names)
     finally:
         conn.close()
     if args.format == "json":
         print(to_json(results))
     else:
-        render(results, console)
+        render(results, console, f"pgpulse: {target}")
     worst = max((r.status for r in results), default=Status.OK)
     threshold = Status.WARN if args.fail_on == "warn" else Status.FAIL
     return 1 if worst >= threshold else 0
