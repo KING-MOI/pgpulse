@@ -29,3 +29,4 @@
 - considered release checklist; parked for now
 - slow start observed while testing
 - follow up on type narrowing
+- slow start observed while testing
