@@ -46,7 +46,9 @@ def to_json(results: list[CheckResult], server: str = "") -> str:
         {
             "server": server,
             "status": worst(results).name.lower(),
-            "checks": [asdict(r) | {"status": r.status.name.lower()} for r in results],
+            "checks": [
+                asdict(r) | {"status": r.status.name.lower(), "seconds": round(r.seconds, 4)} for r in results
+            ],
         },
         indent=2,
     )
