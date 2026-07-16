@@ -4,3 +4,4 @@
 - double-check cleanup logic behavior
 - follow up on docs example
 - double-check release checklist behavior
+- edge case observed while testing
