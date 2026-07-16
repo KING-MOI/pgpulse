@@ -94,7 +94,7 @@ def test_json_format(capsys):
 
     main(["--format", "json"], connect=connector(healthy()))
     data = json.loads(capsys.readouterr().out)
-    assert {d["name"] for d in data} >= {"cache_hit", "connections"}
+    assert {d["name"] for d in data["checks"]} >= {"cache_hit", "connections"}
 
 
 def test_fail_on_warn_turns_warnings_into_failures():
@@ -108,7 +108,7 @@ def test_exclude_flag_drops_checks(capsys):
     main(["--format", "json", "-x", "bloat", "-x", "cache_hit"], connect=connector(healthy()))
     import json
 
-    names = {d["name"] for d in json.loads(capsys.readouterr().out)}
+    names = {d["name"] for d in json.loads(capsys.readouterr().out)["checks"]}
     assert "bloat" not in names and "cache_hit" not in names
     assert "connections" in names
 
@@ -126,7 +126,7 @@ def test_config_can_exclude_checks(tmp_path, capsys):
     path = tmp_path / "pgpulse.toml"
     path.write_text('exclude = ["primary_keys"]\n')
     main(["--config", str(path), "--format", "json"], connect=connector(healthy()))
-    assert "primary_keys" not in {d["name"] for d in json.loads(capsys.readouterr().out)}
+    assert "primary_keys" not in {d["name"] for d in json.loads(capsys.readouterr().out)["checks"]}
 
 
 def test_config_exclude_rejects_unknown_checks(tmp_path, capsys):

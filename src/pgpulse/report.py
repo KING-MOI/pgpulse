@@ -37,5 +37,16 @@ def render(results: list[CheckResult], console: Console, title: str = "pgpulse")
     console.print(", ".join(f"[{STYLES[s]}]{counts[s]} {s.name.lower()}[/]" for s in Status if counts[s]))
 
 
-def to_json(results: list[CheckResult]) -> str:
-    return json.dumps([asdict(r) | {"status": r.status.name.lower()} for r in results], indent=2)
+def worst(results: list[CheckResult]) -> Status:
+    return max((r.status for r in results), default=Status.OK)
+
+
+def to_json(results: list[CheckResult], server: str = "") -> str:
+    return json.dumps(
+        {
+            "server": server,
+            "status": worst(results).name.lower(),
+            "checks": [asdict(r) | {"status": r.status.name.lower()} for r in results],
+        },
+        indent=2,
+    )
