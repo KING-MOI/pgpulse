@@ -35,6 +35,29 @@ List what is available:
 pgpulse --list-checks
 ```
 
+### JSON output
+
+`--format json` prints one object that is easy to feed into monitoring:
+
+```json
+{
+  "server": "app on 10.0.0.5 (PostgreSQL 16.4, primary)",
+  "status": "warn",
+  "checks": [
+    {
+      "name": "bloat",
+      "status": "warn",
+      "summary": "1 bloated table",
+      "details": ["public.events: 31% dead tuples"],
+      "seconds": 0.0021
+    }
+  ]
+}
+```
+
+`status` is one of `skip`, `ok`, `warn`, `fail` or `error`. The top-level
+`status` is the worst of the checks.
+
 ## Configuration
 
 Thresholds live in a TOML file. Every key is optional; anything left out
