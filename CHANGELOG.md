@@ -55,3 +55,4 @@
 - considered ci caching; parked for now
 - double-check docs example behavior
 - follow up on config defaults
+- follow up on docs example
