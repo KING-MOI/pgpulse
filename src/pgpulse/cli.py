@@ -50,6 +50,7 @@ def build_parser() -> argparse.ArgumentParser:
         help="lowest status that makes the exit code non-zero",
     )
     parser.add_argument("--config", type=Path, help="path to a pgpulse.toml file")
+    parser.add_argument("-q", "--quiet", action="store_true", help="only show checks that need attention")
     parser.add_argument(
         "--no-color", action="store_true", help="disable colored output (NO_COLOR is honored too)"
     )
@@ -98,7 +99,7 @@ def main(argv: list[str] | None = None, connect: Callable[[Config], Connection] 
     if args.format == "json":
         print(to_json(results, target))
     else:
-        render(results, console, f"pgpulse: {target}")
+        render(results, console, f"pgpulse: {target}", quiet=args.quiet)
     threshold = Status.WARN if args.fail_on == "warn" else Status.FAIL
     return 1 if worst(results) >= threshold else 0
 

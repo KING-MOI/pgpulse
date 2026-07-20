@@ -50,3 +50,19 @@ def test_skipped_checks_are_dimmed_not_failed():
 def test_report_shows_check_duration():
     text = output([CheckResult("bloat", Status.OK, "fine", seconds=0.0123)])
     assert "12ms" in text
+
+
+def test_quiet_hides_passing_checks_but_keeps_the_tally():
+    console = Console(record=True, width=120, color_system=None)
+    render(
+        [CheckResult("good", Status.OK, "fine"), CheckResult("bad", Status.WARN, "meh")], console, quiet=True
+    )
+    text = console.export_text()
+    assert "good" not in text and "bad" in text
+    assert text.strip().splitlines()[-1] == "1 ok, 1 warn"
+
+
+def test_quiet_with_everything_passing_prints_only_the_tally():
+    console = Console(record=True, width=120, color_system=None)
+    render([CheckResult("good", Status.OK, "fine")], console, quiet=True)
+    assert console.export_text().strip().splitlines() == ["pgpulse", "1 ok"]
