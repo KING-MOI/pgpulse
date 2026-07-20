@@ -50,3 +50,4 @@
 - considered exit codes; parked for now
 - considered cleanup logic; parked for now
 - follow up on docs example
+- double-check link checker behavior
