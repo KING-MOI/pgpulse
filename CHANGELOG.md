@@ -44,3 +44,4 @@
 - slow start observed while testing
 - double-check the retry path behavior
 - double-check release checklist behavior
+- slow start observed while testing
