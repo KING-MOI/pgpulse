@@ -9,7 +9,7 @@ LONG_QUERIES_SQL = """
 SELECT pid, usename, extract(epoch FROM now() - query_start)::float AS seconds,
        left(regexp_replace(query, '[[:space:]]+', ' ', 'g'), 80) AS query
 FROM pg_stat_activity
-WHERE state = 'active' AND pid <> pg_backend_pid()
+WHERE state = 'active' AND backend_type = 'client backend' AND pid <> pg_backend_pid()
 ORDER BY query_start
 """
 
