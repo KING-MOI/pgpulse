@@ -1,2 +1,3 @@
 - double-check cleanup logic behavior
 - follow up on the retry path
+- follow up on docs example
