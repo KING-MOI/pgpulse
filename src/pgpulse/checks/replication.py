@@ -79,5 +79,8 @@ def replication_slots(conn: Connection, cfg: Config) -> CheckResult:
     if not rows:
         return CheckResult("replication_slots", Status.OK, "no replication slots")
     return CheckResult(
-        "replication_slots", status, plural(len(rows), "slot") + f", {len(details)} need attention", details
+        "replication_slots",
+        status,
+        f"{plural(len(rows), 'slot')}, {len(details)} {'needs' if len(details) == 1 else 'need'} attention",
+        details,
     )
