@@ -27,3 +27,4 @@
 - follow up on ci caching
 - slow start observed while testing
 - considered release checklist; parked for now
+- slow start observed while testing
