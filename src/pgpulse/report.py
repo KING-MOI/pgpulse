@@ -55,3 +55,22 @@ def to_json(results: list[CheckResult], server: str = "") -> str:
         },
         indent=2,
     )
+
+
+ICONS = {Status.SKIP: "⚪", Status.OK: "🟢", Status.WARN: "🟡", Status.FAIL: "🔴", Status.ERROR: "🟣"}
+
+
+def to_markdown(results: list[CheckResult], server: str = "") -> str:
+    lines = [
+        f"### pgpulse: {server}" if server else "### pgpulse",
+        "",
+        "| | check | summary |",
+        "|---|---|---|",
+    ]
+    lines += [f"| {ICONS[r.status]} | `{r.name}` | {r.summary} |" for r in results]
+    for r in results:
+        if r.details:
+            lines += ["", f"<details><summary>{r.name}</summary>", ""]
+            lines += [f"- {line}" for line in r.details]
+            lines += ["", "</details>"]
+    return "\n".join(lines)

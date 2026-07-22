@@ -66,3 +66,19 @@ def test_quiet_with_everything_passing_prints_only_the_tally():
     console = Console(record=True, width=120, color_system=None)
     render([CheckResult("good", Status.OK, "fine")], console, quiet=True)
     assert console.export_text().strip().splitlines() == ["pgpulse", "1 ok"]
+
+
+def test_markdown_table_and_collapsed_details():
+    from pgpulse.report import to_markdown
+
+    text = to_markdown(
+        [
+            CheckResult("cache_hit", Status.OK, "99%"),
+            CheckResult("bloat", Status.FAIL, "1 bloated", ["public.a"]),
+        ],
+        "app on db1",
+    )
+    lines = text.splitlines()
+    assert lines[0] == "### pgpulse: app on db1"
+    assert "| 🔴 | `bloat` | 1 bloated |" in lines
+    assert "- public.a" in lines

@@ -13,7 +13,7 @@ from pgpulse.checks import REGISTRY
 from pgpulse.config import Config, load
 from pgpulse.db import Connection, describe
 from pgpulse.db import connect as connect_db
-from pgpulse.report import render, to_json, worst
+from pgpulse.report import render, to_json, to_markdown, worst
 from pgpulse.result import Status
 from pgpulse.runner import run_checks
 
@@ -42,7 +42,9 @@ def build_parser() -> argparse.ArgumentParser:
         metavar="NAME",
         help="skip this check (repeatable)",
     )
-    parser.add_argument("--format", choices=["table", "json"], default="table", help="output format")
+    parser.add_argument(
+        "--format", choices=["table", "json", "markdown"], default="table", help="output format"
+    )
     parser.add_argument(
         "--fail-on",
         choices=["warn", "fail"],
@@ -98,6 +100,8 @@ def main(argv: list[str] | None = None, connect: Callable[[Config], Connection] 
         conn.close()
     if args.format == "json":
         print(to_json(results, target))
+    elif args.format == "markdown":
+        print(to_markdown(results, target))
     else:
         render(results, console, f"pgpulse: {target}", quiet=args.quiet)
     threshold = Status.WARN if args.fail_on == "warn" else Status.FAIL
