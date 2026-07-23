@@ -82,3 +82,11 @@ def test_markdown_table_and_collapsed_details():
     assert lines[0] == "### pgpulse: app on db1"
     assert "| 🔴 | `bloat` | 1 bloated |" in lines
     assert "- public.a" in lines
+
+
+def test_markdown_escapes_query_text():
+    from pgpulse.report import to_markdown
+
+    text = to_markdown([CheckResult("long_queries", Status.WARN, "a | b", ["pid 1: select a<b>c || 'x'"])])
+    assert "| a &#124; b |" in text
+    assert "- pid 1: select a&lt;b&gt;c || &#x27;x&#x27;" in text

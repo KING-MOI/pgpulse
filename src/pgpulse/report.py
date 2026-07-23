@@ -1,5 +1,6 @@
 from __future__ import annotations
 
+import html
 import json
 from collections import Counter
 from dataclasses import asdict
@@ -67,10 +68,13 @@ def to_markdown(results: list[CheckResult], server: str = "") -> str:
         "| | check | summary |",
         "|---|---|---|",
     ]
-    lines += [f"| {ICONS[r.status]} | `{r.name}` | {r.summary} |" for r in results]
+    lines += [
+        f"| {ICONS[r.status]} | `{r.name}` | {html.escape(r.summary).replace('|', '&#124;')} |"
+        for r in results
+    ]
     for r in results:
         if r.details:
             lines += ["", f"<details><summary>{r.name}</summary>", ""]
-            lines += [f"- {line}" for line in r.details]
+            lines += [f"- {html.escape(line)}" for line in r.details]
             lines += ["", "</details>"]
     return "\n".join(lines)
