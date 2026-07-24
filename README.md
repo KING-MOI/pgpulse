@@ -29,10 +29,25 @@ Run a subset of checks:
 pgpulse --dsn "$DATABASE_URL" --check cache_hit --check connections
 ```
 
+Show only the checks that need attention:
+
+```sh
+pgpulse --quiet
+```
+
 List what is available:
 
 ```sh
 pgpulse --list-checks
+```
+
+### Markdown output
+
+`--format markdown` renders a table with collapsible details, handy for a
+GitHub Actions job summary:
+
+```sh
+pgpulse --format markdown >> "$GITHUB_STEP_SUMMARY"
 ```
 
 ### JSON output
