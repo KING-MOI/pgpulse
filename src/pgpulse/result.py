@@ -23,3 +23,11 @@ class CheckResult:
 
 def plural(n: int, one: str, many: str | None = None) -> str:
     return f"{n:,} {one if n == 1 else many or one + 's'}"
+
+
+def grade(value: float, warn: float, fail: float) -> Status:
+    if value >= fail:
+        return Status.FAIL
+    if value >= warn:
+        return Status.WARN
+    return Status.OK
