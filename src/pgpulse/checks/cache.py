@@ -3,7 +3,7 @@ from __future__ import annotations
 from pgpulse.checks import check
 from pgpulse.config import Config
 from pgpulse.db import Connection
-from pgpulse.result import CheckResult, Status
+from pgpulse.result import CheckResult, Status, grade
 
 CACHE_HIT_SQL = """
 SELECT sum(heap_blks_hit)::float AS hit, sum(heap_blks_read)::float AS read
@@ -19,9 +19,5 @@ def cache_hit_ratio(conn: Connection, cfg: Config) -> CheckResult:
     if hit + read == 0:
         return CheckResult("cache_hit", Status.OK, "no table reads recorded yet")
     ratio = hit / (hit + read)
-    status = Status.OK
-    if ratio < cfg.cache_hit.fail:
-        status = Status.FAIL
-    elif ratio < cfg.cache_hit.warn:
-        status = Status.WARN
+    status = grade(1 - ratio, 1 - cfg.cache_hit.warn, 1 - cfg.cache_hit.fail)
     return CheckResult("cache_hit", status, f"table cache hit ratio {ratio:.2%}")
