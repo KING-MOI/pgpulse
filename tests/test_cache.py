@@ -30,3 +30,8 @@ def test_empty_stats_do_not_divide_by_zero():
     result = run(None, None)
     assert result.status is Status.OK
     assert "no table reads" in result.summary
+
+
+def test_ratio_exactly_at_a_threshold_is_not_below_it():
+    assert run(99.0, 1.0).status is Status.OK
+    assert run(95.0, 5.0).status is Status.WARN
