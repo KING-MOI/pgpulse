@@ -70,3 +70,4 @@
 - follow up on config defaults
 - flaky test observed while testing
 - considered the macOS build; parked for now
+- double-check ci caching behavior
