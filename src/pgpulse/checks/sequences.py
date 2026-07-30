@@ -3,7 +3,7 @@ from __future__ import annotations
 from pgpulse.checks import check
 from pgpulse.config import Config
 from pgpulse.db import Connection
-from pgpulse.result import CheckResult, Status, plural
+from pgpulse.result import CheckResult, Status, grade, plural
 
 SEQUENCES_SQL = """
 SELECT s.schemaname, s.sequencename, s.start_value, s.last_value, s.increment_by,
@@ -32,9 +32,10 @@ def sequence_exhaustion(conn: Connection, cfg: Config) -> CheckResult:
     for r in conn.fetchall(SEQUENCES_SQL):
         limit = r["max_value"] if r["increment_by"] > 0 else r["min_value"]
         used = (r["last_value"] - r["start_value"]) / (limit - r["start_value"])
-        if used < limits.warn:
+        level = grade(used, limits.warn, limits.fail)
+        if level is Status.OK:
             continue
-        status = max(status, Status.FAIL if used >= limits.fail else Status.WARN)
+        status = max(status, level)
         details.append(f"{r['schemaname']}.{r['sequencename']}: {used:.1%} of the way to {limit:,}")
     if not details:
         return CheckResult("sequences", Status.OK, "sequences have room to grow")

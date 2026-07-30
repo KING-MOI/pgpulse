@@ -3,7 +3,7 @@ from __future__ import annotations
 from pgpulse.checks import check
 from pgpulse.config import Config
 from pgpulse.db import Connection
-from pgpulse.result import CheckResult, Status, plural
+from pgpulse.result import CheckResult, Status, grade, plural
 
 XID_LIMIT = 2**31
 
@@ -24,11 +24,7 @@ def xid_wraparound(conn: Connection, cfg: Config) -> CheckResult:
         return CheckResult("xid_wraparound", Status.OK, "no databases visible")
     worst = rows[0]
     ratio = worst["age"] / XID_LIMIT
-    status = Status.OK
-    if ratio >= limits.fail:
-        status = Status.FAIL
-    elif ratio >= limits.warn:
-        status = Status.WARN
+    status = grade(ratio, limits.warn, limits.fail)
     details = [
         f"{r['datname']}: {r['age']:,} ({r['age'] / XID_LIMIT:.1%})"
         for r in rows

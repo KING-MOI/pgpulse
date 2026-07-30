@@ -3,7 +3,7 @@ from __future__ import annotations
 from pgpulse.checks import check
 from pgpulse.config import Config
 from pgpulse.db import Connection
-from pgpulse.result import CheckResult, Status, plural
+from pgpulse.result import CheckResult, Status, grade, plural
 
 DEAD_TUPLES_SQL = """
 SELECT schemaname, relname, n_live_tup AS live, n_dead_tup AS dead
@@ -22,9 +22,10 @@ def table_bloat(conn: Connection, cfg: Config) -> CheckResult:
         if total < limits.min_rows:
             continue
         ratio = r["dead"] / total
-        if ratio < limits.warn:
+        level = grade(ratio, limits.warn, limits.fail)
+        if level is Status.OK:
             continue
-        status = max(status, Status.FAIL if ratio >= limits.fail else Status.WARN)
+        status = max(status, level)
         details.append(f"{r['schemaname']}.{r['relname']}: {ratio:.0%} dead tuples")
     if not details:
         return CheckResult("bloat", Status.OK, "no bloated tables")
