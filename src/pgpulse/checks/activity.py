@@ -3,7 +3,7 @@ from __future__ import annotations
 from pgpulse.checks import check
 from pgpulse.config import Config
 from pgpulse.db import Connection, server_version
-from pgpulse.result import CheckResult, Status, plural
+from pgpulse.result import CheckResult, Status, grade, plural
 
 DATABASE_STATS_SQL = """
 SELECT deadlocks, temp_files, temp_bytes, xact_commit, xact_rollback,
@@ -20,11 +20,7 @@ def deadlocks(conn: Connection, cfg: Config) -> CheckResult:
     limits = cfg.deadlocks
     row = conn.fetchall(DATABASE_STATS_SQL)[0]
     per_day = row["deadlocks"] / row["days"]
-    status = Status.OK
-    if per_day >= limits.fail_per_day:
-        status = Status.FAIL
-    elif per_day >= limits.warn_per_day:
-        status = Status.WARN
+    status = grade(per_day, limits.warn_per_day, limits.fail_per_day)
     return CheckResult("deadlocks", status, f"{plural(row['deadlocks'], 'deadlock')}, {per_day:.1f} per day")
 
 
@@ -47,11 +43,7 @@ def rollbacks(conn: Connection, cfg: Config) -> CheckResult:
     row = conn.fetchall(DATABASE_STATS_SQL)[0]
     total = row["xact_commit"] + row["xact_rollback"]
     ratio = row["xact_rollback"] / total if total else 0.0
-    status = Status.OK
-    if ratio >= limits.fail:
-        status = Status.FAIL
-    elif ratio >= limits.warn:
-        status = Status.WARN
+    status = grade(ratio, limits.warn, limits.fail)
     return CheckResult("rollbacks", status, f"{ratio:.1%} of {total:,} transactions rolled back")
 
 
