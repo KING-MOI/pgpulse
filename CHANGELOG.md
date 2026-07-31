@@ -46,3 +46,4 @@
 - double-check release checklist behavior
 - slow start observed while testing
 - considered release checklist; parked for now
+- cache miss observed while testing
