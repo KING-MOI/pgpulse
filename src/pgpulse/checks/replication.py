@@ -3,7 +3,7 @@ from __future__ import annotations
 from pgpulse.checks import check
 from pgpulse.config import Config
 from pgpulse.db import Connection, in_recovery
-from pgpulse.result import CheckResult, Status, plural
+from pgpulse.result import CheckResult, Status, grade, plural
 
 REPLICATION_LAG_SQL = """
 SELECT application_name, coalesce(client_addr::text, 'local') AS client,
@@ -32,10 +32,7 @@ def replication_lag(conn: Connection, cfg: Config) -> CheckResult:
     details = []
     for r in rows:
         lag = r["seconds"] or 0.0
-        if lag >= limits.fail_seconds:
-            status = Status.FAIL
-        elif lag >= limits.warn_seconds:
-            status = max(status, Status.WARN)
+        status = max(status, grade(lag, limits.warn_seconds, limits.fail_seconds))
         details.append(f"{r['application_name']} ({r['client']}): {lag:.1f}s behind")
     worst = max(r["seconds"] or 0.0 for r in rows)
     return CheckResult(
