@@ -3,7 +3,7 @@ from __future__ import annotations
 from pgpulse.checks import check
 from pgpulse.config import Config
 from pgpulse.db import Connection
-from pgpulse.result import CheckResult, Status, plural
+from pgpulse.result import CheckResult, Status, grade, plural
 
 LONG_QUERIES_SQL = """
 SELECT pid, usename, extract(epoch FROM now() - query_start)::float AS seconds,
@@ -22,7 +22,7 @@ def long_running_queries(conn: Connection, cfg: Config) -> CheckResult:
     if not rows:
         return CheckResult("long_queries", Status.OK, "no long-running queries")
     worst = max(r["seconds"] for r in rows)
-    status = Status.FAIL if worst >= limits.fail_seconds else Status.WARN
+    status = grade(worst, limits.warn_seconds, limits.fail_seconds)
     details = [f"pid {r['pid']} ({r['usename']}) {r['seconds']:.0f}s: {r['query']}" for r in rows]
     return CheckResult(
         "long_queries",
@@ -49,6 +49,6 @@ def idle_in_transaction(conn: Connection, cfg: Config) -> CheckResult:
     if not rows:
         return CheckResult("idle_in_transaction", Status.OK, "no idle transactions")
     worst = max(r["seconds"] for r in rows)
-    status = Status.FAIL if worst >= limits.fail_seconds else Status.WARN
+    status = grade(worst, limits.warn_seconds, limits.fail_seconds)
     details = [f"pid {r['pid']} ({r['usename']}) idle {r['seconds']:.0f}s after: {r['query']}" for r in rows]
     return CheckResult("idle_in_transaction", status, plural(len(rows), "idle transaction"), details)

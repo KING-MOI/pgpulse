@@ -3,7 +3,7 @@ from __future__ import annotations
 from pgpulse.checks import check
 from pgpulse.config import Config
 from pgpulse.db import Connection
-from pgpulse.result import CheckResult, Status, plural
+from pgpulse.result import CheckResult, Status, grade, plural
 
 BLOCKED_SQL = """
 SELECT pid, pg_blocking_pids(pid) AS blocked_by,
@@ -22,7 +22,7 @@ def blocking_locks(conn: Connection, cfg: Config) -> CheckResult:
     if not rows:
         return CheckResult("blocking_locks", Status.OK, "no blocked sessions")
     worst = max(r["seconds"] for r in rows)
-    status = Status.FAIL if worst >= limits.fail_seconds else Status.WARN
+    status = grade(worst, limits.warn_seconds, limits.fail_seconds)
     details = [
         f"pid {r['pid']} waiting {r['seconds']:.0f}s on {', '.join(map(str, r['blocked_by']))}: {r['query']}"
         for r in rows
