@@ -63,3 +63,30 @@ def vacuum_age(conn: Connection, cfg: Config) -> CheckResult:
     if not details:
         return CheckResult("vacuum_age", Status.OK, "vacuum is keeping up")
     return CheckResult("vacuum_age", status, plural(len(details), "table") + " overdue for vacuum", details)
+
+
+XMIN_HOLDERS_SQL = """
+SELECT 'session ' || pid AS holder, age(backend_xmin)::bigint AS age
+FROM pg_stat_activity WHERE backend_xmin IS NOT NULL AND pid <> pg_backend_pid()
+UNION ALL
+SELECT 'prepared transaction ' || gid, age(transaction)::bigint FROM pg_prepared_xacts
+UNION ALL
+SELECT 'replication slot ' || slot_name, age(xmin)::bigint FROM pg_replication_slots WHERE xmin IS NOT NULL
+UNION ALL
+SELECT 'replication slot ' || slot_name || ' (catalog)', age(catalog_xmin)::bigint
+FROM pg_replication_slots WHERE catalog_xmin IS NOT NULL
+ORDER BY age DESC
+"""
+
+
+@check("xmin_horizon")
+def xmin_horizon(conn: Connection, cfg: Config) -> CheckResult:
+    """Whatever is holding back the oldest xmin and stopping vacuum from cleaning up."""
+    limits = cfg.xmin_horizon
+    rows = conn.fetchall(XMIN_HOLDERS_SQL)
+    if not rows:
+        return CheckResult("xmin_horizon", Status.OK, "nothing is holding back vacuum")
+    oldest = rows[0]
+    status = grade(oldest["age"], limits.warn_age, limits.fail_age)
+    details = [f"{r['holder']}: {r['age']:,} transactions old" for r in rows if r["age"] >= limits.warn_age]
+    return CheckResult("xmin_horizon", status, f"oldest xmin is {oldest['age']:,} transactions old", details)

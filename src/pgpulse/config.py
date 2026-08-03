@@ -100,6 +100,11 @@ class CheckpointsConfig(Section):
     min_checkpoints: int = 10
 
 
+class XminHorizonConfig(Ascending):
+    warn_age: int = 10_000_000
+    fail_age: int = 100_000_000
+
+
 class UnusedIndexesConfig(Section):
     min_size_bytes: int = 1024 * 1024
 
@@ -130,6 +135,7 @@ class Config(Section):
     bloat: BloatConfig = BloatConfig()
     xid_wraparound: XidWraparoundConfig = XidWraparoundConfig()
     vacuum_age: VacuumAgeConfig = VacuumAgeConfig()
+    xmin_horizon: XminHorizonConfig = XminHorizonConfig()
     replication_lag: ReplicationLagConfig = ReplicationLagConfig()
     replication_slots: ReplicationSlotsConfig = ReplicationSlotsConfig()
     sequences: SequencesConfig = SequencesConfig()

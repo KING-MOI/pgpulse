@@ -58,3 +58,27 @@ def test_dead_row_floor_is_passed_to_the_query():
     cfg = Config.model_validate({"vacuum_age": {"min_dead_rows": 42}})
     vacuum_age(conn, cfg)
     assert conn.params == [(42,)]
+
+
+def run_xmin(*rows):
+    from pgpulse.checks.vacuum import XMIN_HOLDERS_SQL, xmin_horizon
+
+    return xmin_horizon(FakeConnection({XMIN_HOLDERS_SQL: list(rows)}), Config())
+
+
+def test_young_xmin_is_ok():
+    result = run_xmin({"holder": "session 42", "age": 1_000})
+    assert result.status is Status.OK
+    assert result.details == []
+
+
+def test_old_xmin_names_the_holder():
+    result = run_xmin(
+        {"holder": "replication slot cdc", "age": 50_000_000}, {"holder": "session 7", "age": 10}
+    )
+    assert result.status is Status.WARN
+    assert result.details == ["replication slot cdc: 50,000,000 transactions old"]
+
+
+def test_ancient_xmin_fails():
+    assert run_xmin({"holder": "prepared transaction tx1", "age": 300_000_000}).status is Status.FAIL
