@@ -111,6 +111,7 @@ struggling server cannot hang the report.
 | `bloat` | tables with a high share of dead tuples |
 | `vacuum_age` | tables with dead tuples that vacuum has not reached |
 | `xid_wraparound` | transaction ID age per database |
+| `xmin_horizon` | the session, prepared transaction or slot holding back vacuum |
 | `unused_indexes` | non-unique indexes with zero scans |
 | `invalid_indexes` | indexes left behind by a failed concurrent build |
 | `duplicate_indexes` | indexes with identical definitions |
@@ -118,6 +119,11 @@ struggling server cannot hang the report.
 | `replication_lag` | replay lag of standbys, or of this standby |
 | `replication_slots` | inactive slots and the WAL they retain |
 | `sequences` | sequences close to their limit, including the column type |
+| `deadlocks` | deadlocks per day since stats were reset |
+| `temp_files` | bytes spilled to temp files per day |
+| `rollbacks` | share of transactions that roll back |
+| `checkpoints` | share of checkpoints forced by WAL volume |
+| `primary_keys` | tables without a primary key |
 
 ## Exit codes
 
