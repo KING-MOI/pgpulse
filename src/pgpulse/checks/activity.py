@@ -70,3 +70,25 @@ def checkpoints(conn: Connection, cfg: Config) -> CheckResult:
     ratio = row["requested"] / total
     status = Status.WARN if ratio >= limits.warn else Status.OK
     return CheckResult("checkpoints", status, f"{ratio:.0%} of {plural(total, 'checkpoint')} were requested")
+
+
+ARCHIVER_SQL = """
+SELECT current_setting('archive_mode') AS mode, failed_count, last_failed_wal,
+       coalesce(last_failed_time > coalesce(last_archived_time, '-infinity'), false) AS failing
+FROM pg_stat_archiver
+"""
+
+
+@check("archiver")
+def archiver(conn: Connection, cfg: Config) -> CheckResult:
+    """Whether WAL archiving is currently failing."""
+    row = conn.fetchall(ARCHIVER_SQL)[0]
+    if row["mode"] == "off":
+        return CheckResult("archiver", Status.SKIP, "archive_mode is off")
+    if row["failing"]:
+        return CheckResult(
+            "archiver", Status.FAIL, f"archiving is failing, last failed segment {row['last_failed_wal']}"
+        )
+    return CheckResult(
+        "archiver", Status.OK, f"archiving works ({plural(row['failed_count'], 'past failure')})"
+    )

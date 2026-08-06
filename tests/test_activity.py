@@ -84,3 +84,26 @@ def test_few_checkpoints_are_not_judged():
     result = run_checkpoints(160004, 1, 2)
     assert result.status is Status.OK
     assert result.summary == "only 3 checkpoints so far, too few to judge"
+
+
+def run_archiver(**row):
+    from pgpulse.checks.activity import ARCHIVER_SQL, archiver
+
+    base = {"mode": "on", "failed_count": 0, "last_failed_wal": None, "failing": False}
+    return archiver(FakeConnection({ARCHIVER_SQL: [base | row]}), Config())
+
+
+def test_archiving_disabled_is_skipped():
+    assert run_archiver(mode="off").status is Status.SKIP
+
+
+def test_recovered_archiver_is_ok():
+    result = run_archiver(failed_count=3)
+    assert result.status is Status.OK
+    assert result.summary == "archiving works (3 past failures)"
+
+
+def test_failing_archiver_fails():
+    result = run_archiver(failed_count=3, failing=True, last_failed_wal="000000010000000000000042")
+    assert result.status is Status.FAIL
+    assert "000000010000000000000042" in result.summary
