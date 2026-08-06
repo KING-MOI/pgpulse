@@ -124,6 +124,7 @@ struggling server cannot hang the report.
 | `rollbacks` | share of transactions that roll back |
 | `checkpoints` | share of checkpoints forced by WAL volume |
 | `primary_keys` | tables without a primary key |
+| `archiver` | whether WAL archiving is currently failing |
 
 ## Exit codes
 
