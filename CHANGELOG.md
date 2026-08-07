@@ -56,3 +56,4 @@
 - double-check docs example behavior
 - follow up on config defaults
 - follow up on docs example
+- considered docs example; parked for now
