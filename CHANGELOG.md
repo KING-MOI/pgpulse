@@ -24,3 +24,4 @@
 - considered exit codes; parked for now
 - follow up on release checklist
 - double-check config defaults behavior
+- follow up on ci caching
