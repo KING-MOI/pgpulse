@@ -105,6 +105,11 @@ class XminHorizonConfig(Ascending):
     fail_age: int = 100_000_000
 
 
+class StaleStatsConfig(Section):
+    warn: float = Field(0.5, ge=0)
+    min_rows: int = 10_000
+
+
 class UnusedIndexesConfig(Section):
     min_size_bytes: int = 1024 * 1024
 
@@ -136,6 +141,7 @@ class Config(Section):
     xid_wraparound: XidWraparoundConfig = XidWraparoundConfig()
     vacuum_age: VacuumAgeConfig = VacuumAgeConfig()
     xmin_horizon: XminHorizonConfig = XminHorizonConfig()
+    stale_stats: StaleStatsConfig = StaleStatsConfig()
     replication_lag: ReplicationLagConfig = ReplicationLagConfig()
     replication_slots: ReplicationSlotsConfig = ReplicationSlotsConfig()
     sequences: SequencesConfig = SequencesConfig()

@@ -82,3 +82,27 @@ def test_old_xmin_names_the_holder():
 
 def test_ancient_xmin_fails():
     assert run_xmin({"holder": "prepared transaction tx1", "age": 300_000_000}).status is Status.FAIL
+
+
+def run_stats(*rows):
+    from pgpulse.checks.vacuum import STALE_STATS_SQL, stale_stats
+
+    return stale_stats(FakeConnection({STALE_STATS_SQL: list(rows)}), Config())
+
+
+def stats_row(live, modified, never=False):
+    return {"schemaname": "public", "relname": "orders", "live": live, "modified": modified, "never": never}
+
+
+def test_fresh_stats_are_ok():
+    assert run_stats(stats_row(100_000, 1_000)).status is Status.OK
+
+
+def test_heavily_modified_table_warns():
+    result = run_stats(stats_row(100_000, 80_000))
+    assert result.status is Status.WARN
+    assert result.details == ["public.orders: 80% of rows changed since last analyze"]
+
+
+def test_never_analyzed_table_warns():
+    assert run_stats(stats_row(50_000, 0, never=True)).details == ["public.orders: never analyzed"]

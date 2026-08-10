@@ -90,3 +90,31 @@ def xmin_horizon(conn: Connection, cfg: Config) -> CheckResult:
     status = grade(oldest["age"], limits.warn_age, limits.fail_age)
     details = [f"{r['holder']}: {r['age']:,} transactions old" for r in rows if r["age"] >= limits.warn_age]
     return CheckResult("xmin_horizon", status, f"oldest xmin is {oldest['age']:,} transactions old", details)
+
+
+STALE_STATS_SQL = """
+SELECT schemaname, relname, n_live_tup AS live, n_mod_since_analyze AS modified,
+       greatest(last_analyze, last_autoanalyze) IS NULL AS never
+FROM pg_stat_user_tables
+WHERE n_live_tup + n_mod_since_analyze >= %s
+"""
+
+
+@check("stale_stats")
+def stale_stats(conn: Connection, cfg: Config) -> CheckResult:
+    """Tables whose planner statistics are out of date."""
+    limits = cfg.stale_stats
+    details = []
+    for r in conn.fetchall(STALE_STATS_SQL, (limits.min_rows,)):
+        changed = r["modified"] / max(r["live"], 1)
+        if r["never"]:
+            details.append(f"{r['schemaname']}.{r['relname']}: never analyzed")
+        elif changed >= limits.warn:
+            details.append(
+                f"{r['schemaname']}.{r['relname']}: {changed:.0%} of rows changed since last analyze"
+            )
+    if not details:
+        return CheckResult("stale_stats", Status.OK, "planner statistics are fresh")
+    return CheckResult(
+        "stale_stats", Status.WARN, plural(len(details), "table") + " with stale statistics", details
+    )
