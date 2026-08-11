@@ -49,3 +49,15 @@ def test_example_config_matches_defaults():
 
     example = load(Path(__file__).parent.parent / "pgpulse.example.toml")
     assert example.model_dump(exclude={"dsn"}) == Config().model_dump(exclude={"dsn"})
+
+
+def test_example_config_mentions_every_setting():
+    import tomllib
+    from pathlib import Path
+
+    raw = tomllib.loads((Path(__file__).parent.parent / "pgpulse.example.toml").read_text())
+    defaults = Config().model_dump()
+    assert raw.keys() == defaults.keys()
+    for key, value in defaults.items():
+        if isinstance(value, dict):
+            assert raw[key].keys() == value.keys(), key
