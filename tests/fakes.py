@@ -46,7 +46,7 @@ def healthy() -> dict[str, list[dict[str, Any]]]:
         SERVER_SQL: [{"database": "app", "host": "10.0.0.5", "version": "16.4", "in_recovery": False}],
         VERSION_SQL: [{"version": 160004}],
         CHECKPOINTS_SQL: [{"timed": 100, "requested": 2}],
-        CACHE_HIT_SQL: [{"hit": 999.0, "read": 1.0}],
+        CACHE_HIT_SQL: [{"hit": 99_999.0, "read": 1.0}],
         CONNECTIONS_SQL: [{"used": 5, "max": 100}],
         LONG_QUERIES_SQL: [],
         IDLE_IN_TRANSACTION_SQL: [],

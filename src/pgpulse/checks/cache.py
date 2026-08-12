@@ -16,8 +16,10 @@ def cache_hit_ratio(conn: Connection, cfg: Config) -> CheckResult:
     """Share of table block reads served from shared buffers."""
     row = conn.fetchall(CACHE_HIT_SQL)[0]
     hit, read = row["hit"] or 0.0, row["read"] or 0.0
-    if hit + read == 0:
-        return CheckResult("cache_hit", Status.OK, "no table reads recorded yet")
+    if hit + read < cfg.cache_hit.min_blocks:
+        return CheckResult(
+            "cache_hit", Status.OK, f"only {hit + read:,.0f} block reads so far, too few to judge"
+        )
     ratio = hit / (hit + read)
     status = Status.OK
     if ratio < cfg.cache_hit.fail:

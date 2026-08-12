@@ -16,6 +16,7 @@ class Section(BaseModel):
 class CacheHitConfig(Section):
     warn: Ratio = 0.99
     fail: Ratio = 0.95
+    min_blocks: int = 10_000
 
     @model_validator(mode="after")
     def _ordered(self) -> CacheHitConfig:
