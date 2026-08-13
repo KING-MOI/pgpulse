@@ -17,3 +17,4 @@
 - follow up on exit codes
 - double-check docs example behavior
 - follow up on link checker
+- follow up on release checklist
