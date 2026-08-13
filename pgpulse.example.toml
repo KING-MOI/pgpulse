@@ -9,6 +9,11 @@ warn = 0.99
 fail = 0.95
 min_blocks = 10_000
 
+[index_cache_hit]
+warn = 0.99
+fail = 0.95
+min_blocks = 10_000
+
 [connections]
 warn = 0.8
 fail = 0.95

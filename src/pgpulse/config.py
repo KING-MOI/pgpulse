@@ -21,7 +21,7 @@ class CacheHitConfig(Section):
     @model_validator(mode="after")
     def _ordered(self) -> CacheHitConfig:
         if self.fail > self.warn:
-            raise ValueError("cache_hit.fail must not be above cache_hit.warn")
+            raise ValueError("cache hit fail threshold must not be above warn")
         return self
 
 
@@ -132,6 +132,7 @@ class Config(Section):
     statement_timeout_ms: int = Field(10_000, ge=0)
     exclude: list[str] = []
     cache_hit: CacheHitConfig = CacheHitConfig()
+    index_cache_hit: CacheHitConfig = CacheHitConfig()
     connections: ConnectionsConfig = ConnectionsConfig()
     long_queries: LongQueriesConfig = LongQueriesConfig()
     idle_in_transaction: IdleInTransactionConfig = IdleInTransactionConfig()

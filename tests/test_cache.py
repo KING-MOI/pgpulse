@@ -41,3 +41,13 @@ def test_empty_stats_do_not_divide_by_zero():
 def test_ratio_exactly_at_a_threshold_is_not_below_it():
     assert run(99_000.0, 1_000.0).status is Status.OK
     assert run(95_000.0, 5_000.0).status is Status.WARN
+
+
+def test_index_cache_hit_uses_its_own_thresholds():
+    from pgpulse.checks.cache import INDEX_CACHE_HIT_SQL, index_cache_hit_ratio
+
+    conn = FakeConnection({INDEX_CACHE_HIT_SQL: [{"hit": 90_000.0, "read": 10_000.0}]})
+    cfg = Config.model_validate({"index_cache_hit": {"warn": 0.95, "fail": 0.8}})
+    result = index_cache_hit_ratio(conn, cfg)
+    assert result.status is Status.WARN
+    assert result.summary == "index cache hit ratio 90.00%"

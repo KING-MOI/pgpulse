@@ -38,7 +38,7 @@ def test_thresholds_must_be_ordered():
     import pytest
     from pydantic import ValidationError
 
-    with pytest.raises(ValidationError, match="cache_hit.fail"):
+    with pytest.raises(ValidationError, match="cache hit fail threshold"):
         Config.model_validate({"cache_hit": {"warn": 0.9, "fail": 0.95}})
     with pytest.raises(ValidationError, match="fail_seconds"):
         Config.model_validate({"long_queries": {"warn_seconds": 600}})
