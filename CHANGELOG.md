@@ -75,3 +75,4 @@
 - flaky test observed while testing
 - follow up on cleanup logic
 - double-check the macOS build behavior
+- double-check release checklist behavior
