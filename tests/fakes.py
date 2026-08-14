@@ -38,7 +38,13 @@ def healthy() -> dict[str, list[dict[str, Any]]]:
     from pgpulse.checks.schema import NO_PRIMARY_KEY_SQL
     from pgpulse.checks.sequences import SEQUENCES_SQL
     from pgpulse.checks.settings import SETTINGS_SQL
-    from pgpulse.checks.vacuum import STALE_STATS_SQL, STALE_VACUUM_SQL, XID_AGE_SQL, XMIN_HOLDERS_SQL
+    from pgpulse.checks.vacuum import (
+        MXID_AGE_SQL,
+        STALE_STATS_SQL,
+        STALE_VACUUM_SQL,
+        XID_AGE_SQL,
+        XMIN_HOLDERS_SQL,
+    )
     from pgpulse.db import RECOVERY_SQL, SERVER_SQL, VERSION_SQL
 
     return {
@@ -77,4 +83,5 @@ def healthy() -> dict[str, list[dict[str, Any]]]:
         STALE_STATS_SQL: [],
         ARCHIVER_SQL: [{"mode": "on", "failed_count": 0, "last_failed_wal": None, "failing": False}],
         XID_AGE_SQL: [{"datname": "app", "age": 1_000_000}],
+        MXID_AGE_SQL: [{"datname": "app", "age": 10}],
     }

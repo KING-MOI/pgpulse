@@ -141,6 +141,7 @@ class Config(Section):
     index_usage: IndexUsageConfig = IndexUsageConfig()
     bloat: BloatConfig = BloatConfig()
     xid_wraparound: XidWraparoundConfig = XidWraparoundConfig()
+    mxid_wraparound: XidWraparoundConfig = XidWraparoundConfig()
     vacuum_age: VacuumAgeConfig = VacuumAgeConfig()
     xmin_horizon: XminHorizonConfig = XminHorizonConfig()
     stale_stats: StaleStatsConfig = StaleStatsConfig()

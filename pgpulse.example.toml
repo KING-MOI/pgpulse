@@ -46,6 +46,10 @@ min_rows = 10_000
 warn = 0.5
 fail = 0.75
 
+[mxid_wraparound]
+warn = 0.5
+fail = 0.75
+
 [vacuum_age]
 warn_days = 7
 fail_days = 30

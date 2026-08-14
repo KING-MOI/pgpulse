@@ -106,3 +106,12 @@ def test_heavily_modified_table_warns():
 
 def test_never_analyzed_table_warns():
     assert run_stats(stats_row(50_000, 0, never=True)).details == ["public.orders: never analyzed"]
+
+
+def test_multixact_age_has_its_own_check():
+    from pgpulse.checks.vacuum import MXID_AGE_SQL, mxid_wraparound
+
+    conn = FakeConnection({MXID_AGE_SQL: [{"datname": "app", "age": 1_700_000_000}]})
+    result = mxid_wraparound(conn, Config())
+    assert result.status is Status.FAIL
+    assert result.summary == "app has used 79.2% of multixact space"

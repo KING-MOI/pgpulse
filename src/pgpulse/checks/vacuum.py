@@ -1,7 +1,7 @@
 from __future__ import annotations
 
 from pgpulse.checks import check
-from pgpulse.config import Config
+from pgpulse.config import Config, XidWraparoundConfig
 from pgpulse.db import Connection
 from pgpulse.result import CheckResult, Status, grade, plural
 
@@ -15,27 +15,38 @@ ORDER BY age DESC
 """
 
 
-@check("xid_wraparound")
-def xid_wraparound(conn: Connection, cfg: Config) -> CheckResult:
-    """How close each database is to transaction ID wraparound."""
-    limits = cfg.xid_wraparound
-    rows = conn.fetchall(XID_AGE_SQL)
+MXID_AGE_SQL = """
+SELECT datname, mxid_age(datminmxid)::bigint AS age
+FROM pg_database
+WHERE datallowconn
+ORDER BY age DESC
+"""
+
+
+def _wraparound(name: str, kind: str, rows: list[dict], limits: XidWraparoundConfig) -> CheckResult:
     if not rows:
-        return CheckResult("xid_wraparound", Status.OK, "no databases visible")
+        return CheckResult(name, Status.OK, "no databases visible")
     worst = rows[0]
     ratio = worst["age"] / XID_LIMIT
-    status = grade(ratio, limits.warn, limits.fail)
     details = [
         f"{r['datname']}: {r['age']:,} ({r['age'] / XID_LIMIT:.1%})"
         for r in rows
         if r["age"] / XID_LIMIT >= limits.warn
     ]
-    return CheckResult(
-        "xid_wraparound",
-        status,
-        f"{worst['datname']} has used {ratio:.1%} of xid space",
-        details,
-    )
+    summary = f"{worst['datname']} has used {ratio:.1%} of {kind} space"
+    return CheckResult(name, grade(ratio, limits.warn, limits.fail), summary, details)
+
+
+@check("xid_wraparound")
+def xid_wraparound(conn: Connection, cfg: Config) -> CheckResult:
+    """How close each database is to transaction ID wraparound."""
+    return _wraparound("xid_wraparound", "xid", conn.fetchall(XID_AGE_SQL), cfg.xid_wraparound)
+
+
+@check("mxid_wraparound")
+def mxid_wraparound(conn: Connection, cfg: Config) -> CheckResult:
+    """How close each database is to multixact ID wraparound."""
+    return _wraparound("mxid_wraparound", "multixact", conn.fetchall(MXID_AGE_SQL), cfg.mxid_wraparound)
 
 
 STALE_VACUUM_SQL = """
