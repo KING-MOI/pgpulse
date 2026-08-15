@@ -9,3 +9,4 @@
 - follow up on ci caching
 - considered docs example; parked for now
 - double-check cleanup logic behavior
+- double-check docs example behavior
