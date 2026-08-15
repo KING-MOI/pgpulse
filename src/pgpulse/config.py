@@ -111,6 +111,11 @@ class StaleStatsConfig(Section):
     min_rows: int = 10_000
 
 
+class PreparedTransactionsConfig(Ascending):
+    warn_seconds: float = 60
+    fail_seconds: float = 3600
+
+
 class UnusedIndexesConfig(Section):
     min_size_bytes: int = 1024 * 1024
 
@@ -137,6 +142,7 @@ class Config(Section):
     long_queries: LongQueriesConfig = LongQueriesConfig()
     idle_in_transaction: IdleInTransactionConfig = IdleInTransactionConfig()
     blocking_locks: BlockingLocksConfig = BlockingLocksConfig()
+    prepared_transactions: PreparedTransactionsConfig = PreparedTransactionsConfig()
     unused_indexes: UnusedIndexesConfig = UnusedIndexesConfig()
     index_usage: IndexUsageConfig = IndexUsageConfig()
     bloat: BloatConfig = BloatConfig()

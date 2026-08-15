@@ -28,3 +28,25 @@ def blocking_locks(conn: Connection, cfg: Config) -> CheckResult:
         for r in rows
     ]
     return CheckResult("blocking_locks", status, plural(len(rows), "blocked session"), details)
+
+
+PREPARED_SQL = """
+SELECT gid, owner, database, extract(epoch FROM now() - prepared)::float AS seconds
+FROM pg_prepared_xacts
+ORDER BY prepared
+"""
+
+
+@check("prepared_transactions")
+def prepared_transactions(conn: Connection, cfg: Config) -> CheckResult:
+    """Two-phase transactions left prepared, holding locks and blocking vacuum."""
+    limits = cfg.prepared_transactions
+    rows = [r for r in conn.fetchall(PREPARED_SQL) if r["seconds"] >= limits.warn_seconds]
+    if not rows:
+        return CheckResult("prepared_transactions", Status.OK, "no lingering prepared transactions")
+    worst = max(r["seconds"] for r in rows)
+    details = [f"{r['gid']} ({r['owner']} on {r['database']}) prepared {r['seconds']:.0f}s ago" for r in rows]
+    status = grade(worst, limits.warn_seconds, limits.fail_seconds)
+    return CheckResult(
+        "prepared_transactions", status, plural(len(rows), "lingering prepared transaction"), details
+    )

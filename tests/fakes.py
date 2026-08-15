@@ -32,7 +32,7 @@ def healthy() -> dict[str, list[dict[str, Any]]]:
         SEQ_SCANS_SQL,
         UNUSED_INDEXES_SQL,
     )
-    from pgpulse.checks.locks import BLOCKED_SQL
+    from pgpulse.checks.locks import BLOCKED_SQL, PREPARED_SQL
     from pgpulse.checks.queries import IDLE_IN_TRANSACTION_SQL, LONG_QUERIES_SQL
     from pgpulse.checks.replication import REPLICATION_LAG_SQL, SLOTS_SQL
     from pgpulse.checks.schema import NO_PRIMARY_KEY_SQL
@@ -63,6 +63,7 @@ def healthy() -> dict[str, list[dict[str, Any]]]:
         SEQ_SCANS_SQL: [],
         DEAD_TUPLES_SQL: [],
         BLOCKED_SQL: [],
+        PREPARED_SQL: [],
         REPLICATION_LAG_SQL: [],
         SLOTS_SQL: [],
         SEQUENCES_SQL: [],

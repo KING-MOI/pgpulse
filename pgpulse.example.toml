@@ -30,6 +30,10 @@ fail_seconds = 300
 warn_seconds = 10
 fail_seconds = 120
 
+[prepared_transactions]
+warn_seconds = 60
+fail_seconds = 3600
+
 [unused_indexes]
 min_size_bytes = 1_048_576
 
