@@ -45,3 +45,4 @@
 - double-check the retry path behavior
 - double-check release checklist behavior
 - slow start observed while testing
+- considered release checklist; parked for now
