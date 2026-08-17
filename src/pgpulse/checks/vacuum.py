@@ -99,8 +99,12 @@ def xmin_horizon(conn: Connection, cfg: Config) -> CheckResult:
         return CheckResult("xmin_horizon", Status.OK, "nothing is holding back vacuum")
     oldest = rows[0]
     status = grade(oldest["age"], limits.warn_age, limits.fail_age)
-    details = [f"{r['holder']}: {r['age']:,} transactions old" for r in rows if r["age"] >= limits.warn_age]
-    return CheckResult("xmin_horizon", status, f"oldest xmin is {oldest['age']:,} transactions old", details)
+    details = [
+        f"{r['holder']}: {plural(r['age'], 'transaction')} old" for r in rows if r["age"] >= limits.warn_age
+    ]
+    return CheckResult(
+        "xmin_horizon", status, f"oldest xmin is {plural(oldest['age'], 'transaction')} old", details
+    )
 
 
 STALE_STATS_SQL = """
