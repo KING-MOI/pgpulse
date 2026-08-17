@@ -32,3 +32,4 @@
 - slow start observed while testing
 - edge case observed while testing
 - follow up on error messages
+- follow up on config defaults
