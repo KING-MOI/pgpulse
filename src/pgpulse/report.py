@@ -6,6 +6,7 @@ from collections import Counter
 from dataclasses import asdict
 
 from rich.console import Console
+from rich.markup import escape
 from rich.table import Table
 
 from pgpulse.result import CheckResult, Status
@@ -30,13 +31,13 @@ def render(results: list[CheckResult], console: Console, title: str = "pgpulse",
         if quiet and r.status <= Status.OK:
             continue
         table.add_row(
-            f"[{STYLES[r.status]}]{r.status.name}[/]", r.name, r.summary, f"{r.seconds * 1000:.0f}ms"
+            f"[{STYLES[r.status]}]{r.status.name}[/]", r.name, escape(r.summary), f"{r.seconds * 1000:.0f}ms"
         )
     if table.row_count:
         console.print(table)
     for r in results:
         for line in r.details:
-            console.print(f"  [{STYLES[r.status]}]{r.name}[/] {line}")
+            console.print(f"  [{STYLES[r.status]}]{r.name}[/] {escape(line)}")
     counts = Counter(r.status for r in results)
     console.print(", ".join(f"[{STYLES[s]}]{counts[s]} {s.name.lower()}[/]" for s in Status if counts[s]))
 

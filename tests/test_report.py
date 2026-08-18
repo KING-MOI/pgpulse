@@ -90,3 +90,8 @@ def test_markdown_escapes_query_text():
     text = to_markdown([CheckResult("long_queries", Status.WARN, "a | b", ["pid 1: select a<b>c || 'x'"])])
     assert "| a &#124; b |" in text
     assert "- pid 1: select a&lt;b&gt;c || &#x27;x&#x27;" in text
+
+
+def test_query_text_is_not_parsed_as_markup():
+    text = output([CheckResult("long_queries", Status.WARN, "[/]", ["pid 1: select '[/]', '[red]x'"])])
+    assert "pid 1: select '[/]', '[red]x'" in text
