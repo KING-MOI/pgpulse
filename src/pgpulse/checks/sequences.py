@@ -19,7 +19,7 @@ LEFT JOIN pg_depend d
       AND d.objid = format('%I.%I', s.schemaname, s.sequencename)::regclass
       AND d.deptype IN ('a', 'i')
 LEFT JOIN pg_attribute a ON a.attrelid = d.refobjid AND a.attnum = d.refobjsubid
-WHERE s.last_value IS NOT NULL
+WHERE s.last_value IS NOT NULL AND NOT s.cycle
 """
 
 

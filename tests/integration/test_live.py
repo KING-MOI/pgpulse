@@ -64,3 +64,10 @@ def test_duplicate_index_is_flagged(conn, scratch):
     scratch.execute("CREATE INDEX orders_v_partial ON pgpulse_test.orders (v) WHERE id > 0")
     [result] = run_checks(conn, Config(), ["duplicate_indexes"])
     assert "pgpulse_test.orders: orders_v, orders_v_again" in result.details
+
+
+def test_cycling_sequence_is_not_flagged(conn, scratch):
+    scratch.execute("CREATE SEQUENCE pgpulse_test.ring AS int CYCLE")
+    scratch.execute("SELECT setval('pgpulse_test.ring', 2100000000)")
+    [result] = run_checks(conn, Config(), ["sequences"])
+    assert not any(d.startswith("pgpulse_test.ring") for d in result.details), result.details
