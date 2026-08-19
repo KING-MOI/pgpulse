@@ -95,3 +95,11 @@ def test_markdown_escapes_query_text():
 def test_query_text_is_not_parsed_as_markup():
     text = output([CheckResult("long_queries", Status.WARN, "[/]", ["pid 1: select '[/]', '[red]x'"])])
     assert "pid 1: select '[/]', '[red]x'" in text
+
+
+def test_quiet_hides_details_of_passing_checks():
+    console = Console(record=True, width=120, color_system=None)
+    render(
+        [CheckResult("replication_lag", Status.OK, "fine", ["replica1: 0.0s behind"])], console, quiet=True
+    )
+    assert "replica1" not in console.export_text()

@@ -36,6 +36,8 @@ def render(results: list[CheckResult], console: Console, title: str = "pgpulse",
     if table.row_count:
         console.print(table)
     for r in results:
+        if quiet and r.status <= Status.OK:
+            continue
         for line in r.details:
             console.print(f"  [{STYLES[r.status]}]{r.name}[/] {escape(line)}")
     counts = Counter(r.status for r in results)
