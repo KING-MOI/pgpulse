@@ -11,7 +11,7 @@ SELECT s.schemaname, s.relname, s.indexrelname,
        pg_size_pretty(pg_relation_size(s.indexrelid)) AS size
 FROM pg_stat_user_indexes s
 JOIN pg_index i ON i.indexrelid = s.indexrelid
-WHERE s.idx_scan = 0 AND NOT i.indisunique
+WHERE s.idx_scan = 0 AND NOT i.indisunique AND NOT i.indisexclusion
 ORDER BY size_bytes DESC
 """
 

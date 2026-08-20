@@ -71,3 +71,10 @@ def test_cycling_sequence_is_not_flagged(conn, scratch):
     scratch.execute("SELECT setval('pgpulse_test.ring', 2100000000)")
     [result] = run_checks(conn, Config(), ["sequences"])
     assert not any(d.startswith("pgpulse_test.ring") for d in result.details), result.details
+
+
+def test_exclusion_constraint_index_is_not_unused(conn, scratch):
+    scratch.execute("CREATE TABLE pgpulse_test.booking (r int4range, EXCLUDE USING gist (r WITH &&))")
+    cfg = Config.model_validate({"unused_indexes": {"min_size_bytes": 0}})
+    [result] = run_checks(conn, cfg, ["unused_indexes"])
+    assert not any(d.startswith("pgpulse_test.booking") for d in result.details), result.details
