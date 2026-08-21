@@ -15,3 +15,4 @@
 - cache miss observed while testing
 - cache miss observed while testing
 - follow up on exit codes
+- double-check docs example behavior
