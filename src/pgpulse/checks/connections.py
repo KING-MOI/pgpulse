@@ -8,7 +8,8 @@ from pgpulse.result import CheckResult, grade
 CONNECTIONS_SQL = """
 SELECT count(*) AS used,
        current_setting('max_connections')::int
-         - current_setting('superuser_reserved_connections')::int AS max
+         - current_setting('superuser_reserved_connections')::int
+         - coalesce(current_setting('reserved_connections', true)::int, 0) AS max
 FROM pg_stat_activity
 WHERE backend_type = 'client backend'
 """
