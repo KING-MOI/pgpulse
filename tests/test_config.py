@@ -44,6 +44,19 @@ def test_thresholds_must_be_ordered():
         Config.model_validate({"long_queries": {"warn_seconds": 600}})
 
 
+def test_every_warn_threshold_is_checked_against_fail():
+    import pytest
+    from pydantic import ValidationError
+
+    for section, key in [
+        ("vacuum_age", "warn_days"),
+        ("replication_slots", "warn_bytes"),
+        ("deadlocks", "warn_per_day"),
+    ]:
+        with pytest.raises(ValidationError, match=key.replace("warn", "fail")):
+            Config.model_validate({section: {key: 10**12}})
+
+
 def test_example_config_matches_defaults():
     from pathlib import Path
 

@@ -61,7 +61,7 @@ class XidWraparoundConfig(Ascending):
     fail: Ratio = 0.75
 
 
-class VacuumAgeConfig(Section):
+class VacuumAgeConfig(Ascending):
     warn_days: float = 7
     fail_days: float = 30
     min_dead_rows: int = 10_000
@@ -72,7 +72,7 @@ class ReplicationLagConfig(Ascending):
     fail_seconds: float = 300
 
 
-class ReplicationSlotsConfig(Section):
+class ReplicationSlotsConfig(Ascending):
     warn_bytes: int = 1024**3
     fail_bytes: int = 10 * 1024**3
 
@@ -82,7 +82,7 @@ class SequencesConfig(Ascending):
     fail: Ratio = 0.9
 
 
-class DeadlocksConfig(Section):
+class DeadlocksConfig(Ascending):
     warn_per_day: float = 1
     fail_per_day: float = 20
 
