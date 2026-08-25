@@ -139,3 +139,10 @@ def test_config_exclude_rejects_unknown_checks(tmp_path, capsys):
 def test_malformed_dsn_exits_two(capsys):
     assert main(["--dsn", "garbage"]) == 2
     assert "invalid dsn" in capsys.readouterr().err
+
+
+def test_repeated_check_flag_runs_once(capsys):
+    import json
+
+    main(["--format", "json", "-c", "bloat", "-c", "bloat"], connect=connector(healthy()))
+    assert [d["name"] for d in json.loads(capsys.readouterr().out)["checks"]] == ["bloat"]

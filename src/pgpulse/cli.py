@@ -81,7 +81,7 @@ def main(argv: list[str] | None = None, connect: Callable[[Config], Connection] 
             f"[bold red]bad config:[/] unknown checks in exclude: {', '.join(unknown)}"
         )
         return 2
-    names = [n for n in args.check or REGISTRY if n not in args.exclude + cfg.exclude]
+    names = [n for n in dict.fromkeys(args.check or REGISTRY) if n not in args.exclude + cfg.exclude]
     if not names:
         Console(stderr=True).print("[bold red]no checks selected[/]")
         return 2
