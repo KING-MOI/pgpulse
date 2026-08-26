@@ -38,8 +38,9 @@ def test_far_behind_standby_fails():
 GB = 1024**3
 
 
-def slot(name, active, retained):
+def slot(name, active, retained, wal_status="reserved"):
     return {
+        "wal_status": wal_status,
         "slot_name": name,
         "slot_type": "logical",
         "active": active,
@@ -77,3 +78,9 @@ def test_standby_reports_its_own_replay_lag():
     result = replication_lag(conn, Config())
     assert result.status is Status.WARN
     assert result.details == ["this standby (local): 90.0s behind"]
+
+
+def test_lost_slot_fails():
+    result = run_slots(slot("cdc", False, None, wal_status="lost"))
+    assert result.status is Status.FAIL
+    assert result.details == ["cdc (logical, inactive) is lost, its consumer must be rebuilt"]

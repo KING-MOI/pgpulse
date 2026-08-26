@@ -47,7 +47,7 @@ SLOTS_SQL = """
 WITH pos AS (
     SELECT CASE WHEN pg_is_in_recovery() THEN pg_last_wal_replay_lsn() ELSE pg_current_wal_lsn() END AS lsn
 )
-SELECT slot_name, slot_type, active,
+SELECT slot_name, slot_type, active, wal_status,
        pg_wal_lsn_diff(pos.lsn, restart_lsn)::bigint AS retained_bytes,
        pg_size_pretty(pg_wal_lsn_diff(pos.lsn, restart_lsn)) AS retained
 FROM pg_replication_slots, pos
@@ -63,13 +63,19 @@ def replication_slots(conn: Connection, cfg: Config) -> CheckResult:
     details = []
     for r in rows:
         retained = r["retained_bytes"] or 0
+        state = "active" if r["active"] else "inactive"
+        if r["wal_status"] == "lost":
+            status = Status.FAIL
+            details.append(
+                f"{r['slot_name']} ({r['slot_type']}, {state}) is lost, its consumer must be rebuilt"
+            )
+            continue
         if retained >= limits.fail_bytes:
             status = Status.FAIL
         elif not r["active"] or retained >= limits.warn_bytes:
             status = max(status, Status.WARN)
         else:
             continue
-        state = "active" if r["active"] else "inactive"
         details.append(
             f"{r['slot_name']} ({r['slot_type']}, {state}) retains {r['retained'] or '0 bytes'} of WAL"
         )
