@@ -33,7 +33,7 @@ def healthy() -> dict[str, list[dict[str, Any]]]:
         UNUSED_INDEXES_SQL,
     )
     from pgpulse.checks.locks import BLOCKED_SQL, PREPARED_SQL
-    from pgpulse.checks.queries import IDLE_IN_TRANSACTION_SQL, LONG_QUERIES_SQL
+    from pgpulse.checks.queries import IDLE_IN_TRANSACTION_SQL, LONG_QUERIES_SQL, LONG_TRANSACTIONS_SQL
     from pgpulse.checks.replication import REPLICATION_LAG_SQL, SLOTS_SQL
     from pgpulse.checks.schema import NO_PRIMARY_KEY_SQL
     from pgpulse.checks.sequences import SEQUENCES_SQL
@@ -57,6 +57,7 @@ def healthy() -> dict[str, list[dict[str, Any]]]:
         CONNECTIONS_SQL: [{"used": 5, "max": 100}],
         LONG_QUERIES_SQL: [],
         IDLE_IN_TRANSACTION_SQL: [],
+        LONG_TRANSACTIONS_SQL: [],
         UNUSED_INDEXES_SQL: [],
         INVALID_INDEXES_SQL: [],
         DUPLICATE_INDEXES_SQL: [],

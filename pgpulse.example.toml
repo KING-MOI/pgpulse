@@ -22,6 +22,10 @@ fail = 0.95
 warn_seconds = 60
 fail_seconds = 300
 
+[long_transactions]
+warn_seconds = 300
+fail_seconds = 3600
+
 [idle_in_transaction]
 warn_seconds = 30
 fail_seconds = 300

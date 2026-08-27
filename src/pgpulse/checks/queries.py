@@ -52,3 +52,27 @@ def idle_in_transaction(conn: Connection, cfg: Config) -> CheckResult:
     status = grade(worst, limits.warn_seconds, limits.fail_seconds)
     details = [f"pid {r['pid']} ({r['usename']}) idle {r['seconds']:.0f}s after: {r['query']}" for r in rows]
     return CheckResult("idle_in_transaction", status, plural(len(rows), "idle transaction"), details)
+
+
+LONG_TRANSACTIONS_SQL = """
+SELECT pid, usename, state, extract(epoch FROM now() - xact_start)::float AS seconds,
+       left(regexp_replace(query, '[[:space:]]+', ' ', 'g'), 80) AS query
+FROM pg_stat_activity
+WHERE xact_start IS NOT NULL AND backend_type = 'client backend' AND pid <> pg_backend_pid()
+ORDER BY xact_start
+"""
+
+
+@check("long_transactions")
+def long_transactions(conn: Connection, cfg: Config) -> CheckResult:
+    """Transactions open for a long time, whatever they are doing right now."""
+    limits = cfg.long_transactions
+    rows = [r for r in conn.fetchall(LONG_TRANSACTIONS_SQL) if r["seconds"] >= limits.warn_seconds]
+    if not rows:
+        return CheckResult("long_transactions", Status.OK, "no long transactions")
+    worst = max(r["seconds"] for r in rows)
+    status = grade(worst, limits.warn_seconds, limits.fail_seconds)
+    details = [
+        f"pid {r['pid']} ({r['usename']}, {r['state']}) open {r['seconds']:.0f}s: {r['query']}" for r in rows
+    ]
+    return CheckResult("long_transactions", status, plural(len(rows), "long transaction"), details)

@@ -46,6 +46,11 @@ class LongQueriesConfig(Ascending):
     fail_seconds: float = 300
 
 
+class LongTransactionsConfig(Ascending):
+    warn_seconds: float = 300
+    fail_seconds: float = 3600
+
+
 class IdleInTransactionConfig(Ascending):
     warn_seconds: float = 30
     fail_seconds: float = 300
@@ -140,6 +145,7 @@ class Config(Section):
     index_cache_hit: CacheHitConfig = CacheHitConfig()
     connections: ConnectionsConfig = ConnectionsConfig()
     long_queries: LongQueriesConfig = LongQueriesConfig()
+    long_transactions: LongTransactionsConfig = LongTransactionsConfig()
     idle_in_transaction: IdleInTransactionConfig = IdleInTransactionConfig()
     blocking_locks: BlockingLocksConfig = BlockingLocksConfig()
     prepared_transactions: PreparedTransactionsConfig = PreparedTransactionsConfig()
