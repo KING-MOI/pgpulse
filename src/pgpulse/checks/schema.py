@@ -28,3 +28,30 @@ def missing_primary_keys(conn: Connection, cfg: Config) -> CheckResult:
     return CheckResult(
         "primary_keys", Status.WARN, plural(len(rows), "table") + " without a primary key", details
     )
+
+
+UNINDEXED_FOREIGN_KEYS_SQL = """
+SELECT n.nspname AS schemaname, t.relname, c.conname
+FROM pg_constraint c
+JOIN pg_class t ON t.oid = c.conrelid
+JOIN pg_namespace n ON n.oid = t.relnamespace
+WHERE c.contype = 'f' AND c.conparentid = 0
+  AND NOT EXISTS (
+      SELECT 1 FROM pg_index i
+      WHERE i.indrelid = c.conrelid
+        AND (string_to_array(i.indkey::text, ' ')::int2[])[1:cardinality(c.conkey)] @> c.conkey
+  )
+ORDER BY 1, 2, 3
+"""
+
+
+@check("unindexed_foreign_keys")
+def unindexed_foreign_keys(conn: Connection, cfg: Config) -> CheckResult:
+    """Foreign keys with no index on the referencing columns, so parent deletes scan the child."""
+    rows = conn.fetchall(UNINDEXED_FOREIGN_KEYS_SQL)
+    if not rows:
+        return CheckResult("unindexed_foreign_keys", Status.OK, "every foreign key is indexed")
+    details = [f"{r['schemaname']}.{r['relname']}: {r['conname']}" for r in rows]
+    return CheckResult(
+        "unindexed_foreign_keys", Status.WARN, plural(len(rows), "unindexed foreign key"), details
+    )

@@ -35,7 +35,7 @@ def healthy() -> dict[str, list[dict[str, Any]]]:
     from pgpulse.checks.locks import BLOCKED_SQL, PREPARED_SQL
     from pgpulse.checks.queries import IDLE_IN_TRANSACTION_SQL, LONG_QUERIES_SQL, LONG_TRANSACTIONS_SQL
     from pgpulse.checks.replication import REPLICATION_LAG_SQL, SLOTS_SQL
-    from pgpulse.checks.schema import NO_PRIMARY_KEY_SQL
+    from pgpulse.checks.schema import NO_PRIMARY_KEY_SQL, UNINDEXED_FOREIGN_KEYS_SQL
     from pgpulse.checks.sequences import SEQUENCES_SQL
     from pgpulse.checks.settings import SETTINGS_SQL
     from pgpulse.checks.vacuum import (
@@ -70,6 +70,7 @@ def healthy() -> dict[str, list[dict[str, Any]]]:
         SEQUENCES_SQL: [],
         SETTINGS_SQL: [{"name": "fsync", "setting": "on"}],
         NO_PRIMARY_KEY_SQL: [],
+        UNINDEXED_FOREIGN_KEYS_SQL: [],
         DATABASE_STATS_SQL: [
             {
                 "deadlocks": 0,
