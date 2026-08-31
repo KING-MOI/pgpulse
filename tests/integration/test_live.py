@@ -78,3 +78,25 @@ def test_exclusion_constraint_index_is_not_unused(conn, scratch):
     cfg = Config.model_validate({"unused_indexes": {"min_size_bytes": 0}})
     [result] = run_checks(conn, cfg, ["unused_indexes"])
     assert not any(d.startswith("pgpulse_test.booking") for d in result.details), result.details
+
+
+@pytest.mark.parametrize(
+    ("index", "flagged"),
+    [
+        (None, True),
+        ("(a, b)", False),
+        ("(b, a)", False),
+        ("(a, b, c)", False),
+        ("(a, c, b)", True),
+        ("(a)", True),
+    ],
+)
+def test_foreign_key_index_coverage(conn, scratch, index, flagged):
+    scratch.execute("CREATE TABLE pgpulse_test.parent (a int, b int, PRIMARY KEY (a, b))")
+    scratch.execute(
+        "CREATE TABLE pgpulse_test.child (a int, b int, c int, FOREIGN KEY (a, b) REFERENCES pgpulse_test.parent)"
+    )
+    if index:
+        scratch.execute(f"CREATE INDEX ON pgpulse_test.child {index}")
+    [result] = run_checks(conn, Config(), ["unindexed_foreign_keys"])
+    assert ("pgpulse_test.child: child_a_b_fkey" in result.details) is flagged, result.details
