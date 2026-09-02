@@ -55,3 +55,25 @@ def unindexed_foreign_keys(conn: Connection, cfg: Config) -> CheckResult:
     return CheckResult(
         "unindexed_foreign_keys", Status.WARN, plural(len(rows), "unindexed foreign key"), details
     )
+
+
+NOT_VALID_CONSTRAINTS_SQL = """
+SELECT n.nspname AS schemaname, t.relname, c.conname
+FROM pg_constraint c
+JOIN pg_class t ON t.oid = c.conrelid
+JOIN pg_namespace n ON n.oid = t.relnamespace
+WHERE NOT c.convalidated
+ORDER BY 1, 2, 3
+"""
+
+
+@check("not_valid_constraints")
+def not_valid_constraints(conn: Connection, cfg: Config) -> CheckResult:
+    """Constraints added NOT VALID and never validated, so old rows may break them."""
+    rows = conn.fetchall(NOT_VALID_CONSTRAINTS_SQL)
+    if not rows:
+        return CheckResult("not_valid_constraints", Status.OK, "every constraint is validated")
+    details = [f"{r['schemaname']}.{r['relname']}: {r['conname']}" for r in rows]
+    return CheckResult(
+        "not_valid_constraints", Status.WARN, plural(len(rows), "unvalidated constraint"), details
+    )

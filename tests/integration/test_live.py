@@ -100,3 +100,13 @@ def test_foreign_key_index_coverage(conn, scratch, index, flagged):
         scratch.execute(f"CREATE INDEX ON pgpulse_test.child {index}")
     [result] = run_checks(conn, Config(), ["unindexed_foreign_keys"])
     assert ("pgpulse_test.child: child_a_b_fkey" in result.details) is flagged, result.details
+
+
+def test_not_valid_constraint_is_flagged_until_validated(conn, scratch):
+    scratch.execute("CREATE TABLE pgpulse_test.prices (v int)")
+    scratch.execute("ALTER TABLE pgpulse_test.prices ADD CONSTRAINT positive CHECK (v > 0) NOT VALID")
+    [result] = run_checks(conn, Config(), ["not_valid_constraints"])
+    assert "pgpulse_test.prices: positive" in result.details
+    scratch.execute("ALTER TABLE pgpulse_test.prices VALIDATE CONSTRAINT positive")
+    [result] = run_checks(conn, Config(), ["not_valid_constraints"])
+    assert "pgpulse_test.prices: positive" not in result.details
