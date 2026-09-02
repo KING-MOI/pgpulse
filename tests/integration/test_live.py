@@ -110,3 +110,12 @@ def test_not_valid_constraint_is_flagged_until_validated(conn, scratch):
     scratch.execute("ALTER TABLE pgpulse_test.prices VALIDATE CONSTRAINT positive")
     [result] = run_checks(conn, Config(), ["not_valid_constraints"])
     assert "pgpulse_test.prices: positive" not in result.details
+
+
+def test_outdated_extension_is_flagged(conn, scratch):
+    scratch.execute("CREATE EXTENSION hstore VERSION '1.4' SCHEMA pgpulse_test")
+    try:
+        [result] = run_checks(conn, Config(), ["extension_updates"])
+        assert any(d.startswith("hstore 1.4 -> ") for d in result.details), result.details
+    finally:
+        scratch.execute("DROP EXTENSION hstore")
