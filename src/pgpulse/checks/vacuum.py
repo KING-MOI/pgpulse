@@ -133,3 +133,18 @@ def stale_stats(conn: Connection, cfg: Config) -> CheckResult:
     return CheckResult(
         "stale_stats", Status.WARN, plural(len(details), "table") + " with stale statistics", details
     )
+
+
+AUTOVACUUM_WORKERS_SQL = """
+SELECT count(*) FILTER (WHERE backend_type = 'autovacuum worker') AS busy,
+       current_setting('autovacuum_max_workers')::int AS max
+FROM pg_stat_activity
+"""
+
+
+@check("autovacuum_workers")
+def autovacuum_workers(conn: Connection, cfg: Config) -> CheckResult:
+    """Whether every autovacuum worker is busy, so other tables wait their turn."""
+    row = conn.fetchall(AUTOVACUUM_WORKERS_SQL)[0]
+    status = Status.WARN if row["busy"] >= row["max"] else Status.OK
+    return CheckResult("autovacuum_workers", status, f"{row['busy']}/{row['max']} autovacuum workers busy")

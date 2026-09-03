@@ -1,3 +1,4 @@
+import pytest
 from fakes import FakeConnection
 
 from pgpulse.checks.vacuum import XID_AGE_SQL, xid_wraparound
@@ -115,3 +116,13 @@ def test_multixact_age_has_its_own_check():
     result = mxid_wraparound(conn, Config())
     assert result.status is Status.FAIL
     assert result.summary == "app has used 79.2% of multixact space"
+
+
+@pytest.mark.parametrize(("busy", "expected"), [(0, Status.OK), (2, Status.OK), (3, Status.WARN)])
+def test_autovacuum_worker_saturation(busy, expected):
+    from pgpulse.checks.vacuum import AUTOVACUUM_WORKERS_SQL, autovacuum_workers
+
+    conn = FakeConnection({AUTOVACUUM_WORKERS_SQL: [{"busy": busy, "max": 3}]})
+    result = autovacuum_workers(conn, Config())
+    assert result.status is expected
+    assert result.summary == f"{busy}/3 autovacuum workers busy"

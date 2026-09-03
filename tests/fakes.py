@@ -44,6 +44,7 @@ def healthy() -> dict[str, list[dict[str, Any]]]:
     from pgpulse.checks.sequences import SEQUENCES_SQL
     from pgpulse.checks.settings import SETTINGS_SQL
     from pgpulse.checks.vacuum import (
+        AUTOVACUUM_WORKERS_SQL,
         MXID_AGE_SQL,
         STALE_STATS_SQL,
         STALE_VACUUM_SQL,
@@ -89,6 +90,7 @@ def healthy() -> dict[str, list[dict[str, Any]]]:
             }
         ],
         STALE_VACUUM_SQL: [],
+        AUTOVACUUM_WORKERS_SQL: [{"busy": 0, "max": 3}],
         XMIN_HOLDERS_SQL: [],
         STALE_STATS_SQL: [],
         ARCHIVER_SQL: [{"mode": "on", "failed_count": 0, "last_failed_wal": None, "failing": False}],
