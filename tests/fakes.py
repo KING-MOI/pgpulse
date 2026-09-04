@@ -25,7 +25,7 @@ def healthy() -> dict[str, list[dict[str, Any]]]:
     from pgpulse.checks.activity import ARCHIVER_SQL, CHECKPOINTS_SQL, DATABASE_STATS_SQL
     from pgpulse.checks.bloat import DEAD_TUPLES_SQL
     from pgpulse.checks.cache import CACHE_HIT_SQL, INDEX_CACHE_HIT_SQL
-    from pgpulse.checks.connections import CONNECTIONS_SQL
+    from pgpulse.checks.connections import CONNECTIONS_SQL, UNENCRYPTED_SQL
     from pgpulse.checks.extensions import OUTDATED_EXTENSIONS_SQL
     from pgpulse.checks.indexes import (
         DUPLICATE_INDEXES_SQL,
@@ -61,6 +61,7 @@ def healthy() -> dict[str, list[dict[str, Any]]]:
         CACHE_HIT_SQL: [{"hit": 99_999.0, "read": 1.0}],
         INDEX_CACHE_HIT_SQL: [{"hit": 99_999.0, "read": 1.0}],
         CONNECTIONS_SQL: [{"used": 5, "max": 100}],
+        UNENCRYPTED_SQL: [],
         LONG_QUERIES_SQL: [],
         IDLE_IN_TRANSACTION_SQL: [],
         LONG_TRANSACTIONS_SQL: [],
