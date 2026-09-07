@@ -83,6 +83,12 @@ fail_bytes = 10_737_418_240
 warn = 0.75
 fail = 0.9
 
+[table_growth]
+state_file = ""
+min_hours = 1
+warn_bytes_per_day = 1_073_741_824
+fail_bytes_per_day = 10_737_418_240
+
 [deadlocks]
 warn_per_day = 1
 fail_per_day = 20

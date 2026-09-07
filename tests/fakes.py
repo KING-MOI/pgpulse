@@ -27,6 +27,7 @@ def healthy() -> dict[str, list[dict[str, Any]]]:
     from pgpulse.checks.cache import CACHE_HIT_SQL, INDEX_CACHE_HIT_SQL
     from pgpulse.checks.connections import CONNECTIONS_SQL, UNENCRYPTED_SQL
     from pgpulse.checks.extensions import OUTDATED_EXTENSIONS_SQL
+    from pgpulse.checks.growth import TABLE_SIZES_SQL
     from pgpulse.checks.indexes import (
         DUPLICATE_INDEXES_SQL,
         INVALID_INDEXES_SQL,
@@ -75,6 +76,7 @@ def healthy() -> dict[str, list[dict[str, Any]]]:
         REPLICATION_LAG_SQL: [],
         SLOTS_SQL: [],
         SEQUENCES_SQL: [],
+        TABLE_SIZES_SQL: [],
         SETTINGS_SQL: [{"name": "fsync", "setting": "on"}],
         NO_PRIMARY_KEY_SQL: [],
         OUTDATED_EXTENSIONS_SQL: [],

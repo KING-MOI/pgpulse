@@ -136,6 +136,13 @@ class BloatConfig(Ascending):
     min_rows: int = 10_000
 
 
+class TableGrowthConfig(Ascending):
+    state_file: str = ""
+    min_hours: float = Field(1, ge=0)
+    warn_bytes_per_day: int = 1024**3
+    fail_bytes_per_day: int = 10 * 1024**3
+
+
 class Config(Section):
     dsn: str | None = None
     connect_timeout: int = Field(10, gt=0)
@@ -160,6 +167,7 @@ class Config(Section):
     replication_lag: ReplicationLagConfig = ReplicationLagConfig()
     replication_slots: ReplicationSlotsConfig = ReplicationSlotsConfig()
     sequences: SequencesConfig = SequencesConfig()
+    table_growth: TableGrowthConfig = TableGrowthConfig()
     deadlocks: DeadlocksConfig = DeadlocksConfig()
     temp_files: TempFilesConfig = TempFilesConfig()
     rollbacks: RollbacksConfig = RollbacksConfig()
