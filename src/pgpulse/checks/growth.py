@@ -40,7 +40,9 @@ def table_growth(conn: Connection, cfg: Config) -> CheckResult:
             "table_growth", Status.SKIP, f"last snapshot is {age:.0f} minutes old, need {limits.min_hours:g}h"
         )
     state[database] = {"taken": now, "sizes": {r["name"]: r["bytes"] for r in rows}}
-    path.write_text(json.dumps(state))
+    scratch = path.with_name(path.name + ".tmp")
+    scratch.write_text(json.dumps(state))
+    scratch.replace(path)
     if not previous:
         return CheckResult("table_growth", Status.SKIP, "saved a first size snapshot to compare against")
     days = (now - previous["taken"]) / 86400
