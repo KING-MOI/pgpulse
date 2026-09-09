@@ -77,7 +77,9 @@ def vacuum_age(conn: Connection, cfg: Config) -> CheckResult:
 
 
 XMIN_HOLDERS_SQL = """
-SELECT 'session ' || pid AS holder, age(backend_xmin)::bigint AS age
+SELECT format('%s %s (%s)', backend_type, pid, coalesce(nullif(application_name, ''), usename::text, 'unknown'))
+         AS holder,
+       age(backend_xmin)::bigint AS age
 FROM pg_stat_activity WHERE backend_xmin IS NOT NULL AND pid <> pg_backend_pid()
 UNION ALL
 SELECT 'prepared transaction ' || gid, age(transaction)::bigint FROM pg_prepared_xacts
