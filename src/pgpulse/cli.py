@@ -101,7 +101,7 @@ def main(argv: list[str] | None = None, connect: Callable[[Config], Connection] 
     if args.format == "json":
         print(to_json(results, target))
     elif args.format == "markdown":
-        print(to_markdown(results, target))
+        print(to_markdown([r for r in results if not args.quiet or r.status > Status.OK], target))
     else:
         render(results, console, f"pgpulse: {target}", quiet=args.quiet)
     threshold = Status.WARN if args.fail_on == "warn" else Status.FAIL

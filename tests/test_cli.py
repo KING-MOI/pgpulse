@@ -146,3 +146,12 @@ def test_repeated_check_flag_runs_once(capsys):
 
     main(["--format", "json", "-c", "bloat", "-c", "bloat"], connect=connector(healthy()))
     assert [d["name"] for d in json.loads(capsys.readouterr().out)["checks"]] == ["bloat"]
+
+
+def test_quiet_markdown_lists_only_problems(capsys):
+    responses = healthy()
+    responses[CONNECTIONS_SQL] = [{"used": 85, "max": 100}]
+    main(["--format", "markdown", "--quiet"], connect=connector(responses))
+    out = capsys.readouterr().out
+    assert "`connections`" in out
+    assert "`cache_hit`" not in out
