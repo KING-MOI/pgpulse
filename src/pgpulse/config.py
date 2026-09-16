@@ -2,7 +2,7 @@ from __future__ import annotations
 
 import tomllib
 from pathlib import Path
-from typing import Annotated
+from typing import Annotated, Literal
 
 from pydantic import BaseModel, ConfigDict, Field, model_validator
 
@@ -148,6 +148,7 @@ class Config(Section):
     connect_timeout: int = Field(10, gt=0)
     statement_timeout_ms: int = Field(10_000, ge=0)
     exclude: list[str] = []
+    fail_on: Literal["warn", "fail"] = "fail"
     cache_hit: CacheHitConfig = CacheHitConfig()
     index_cache_hit: CacheHitConfig = CacheHitConfig()
     connections: ConnectionsConfig = ConnectionsConfig()

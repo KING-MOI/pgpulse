@@ -155,3 +155,12 @@ def test_quiet_markdown_lists_only_problems(capsys):
     out = capsys.readouterr().out
     assert "`connections`" in out
     assert "`cache_hit`" not in out
+
+
+def test_config_sets_fail_on_and_flag_overrides_it(tmp_path):
+    path = tmp_path / "pgpulse.toml"
+    path.write_text('fail_on = "warn"\n')
+    responses = healthy()
+    responses[CONNECTIONS_SQL] = [{"used": 85, "max": 100}]
+    assert main(["--config", str(path)], connect=connector(responses)) == 1
+    assert main(["--config", str(path), "--fail-on", "fail"], connect=connector(responses)) == 0

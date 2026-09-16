@@ -3,6 +3,7 @@ dsn = "postgresql://pgpulse@localhost/app"
 connect_timeout = 10
 statement_timeout_ms = 10_000
 exclude = []
+fail_on = "fail"
 
 [cache_hit]
 warn = 0.99
