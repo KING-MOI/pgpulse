@@ -80,3 +80,4 @@
 - follow up on exit codes
 - considered cleanup logic; parked for now
 - double-check config defaults behavior
+- follow up on release checklist
