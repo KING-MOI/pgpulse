@@ -164,3 +164,12 @@ def test_config_sets_fail_on_and_flag_overrides_it(tmp_path):
     responses[CONNECTIONS_SQL] = [{"used": 85, "max": 100}]
     assert main(["--config", str(path)], connect=connector(responses)) == 1
     assert main(["--config", str(path), "--fail-on", "fail"], connect=connector(responses)) == 0
+
+
+def test_config_path_falls_back_to_environment(tmp_path, monkeypatch):
+    path = tmp_path / "pgpulse.toml"
+    path.write_text('dsn = "from-config-env"\n')
+    monkeypatch.setenv("PGPULSE_CONFIG", str(path))
+    connect = connector(healthy())
+    main([], connect=connect)
+    assert connect.conns[0].dsn == "from-config-env"

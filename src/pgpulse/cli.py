@@ -50,7 +50,12 @@ def build_parser() -> argparse.ArgumentParser:
         choices=["warn", "fail"],
         help="lowest status that makes the exit code non-zero (default: fail_on from config, then fail)",
     )
-    parser.add_argument("--config", type=Path, help="path to a pgpulse.toml file")
+    parser.add_argument(
+        "--config",
+        type=Path,
+        default=os.environ.get("PGPULSE_CONFIG") or None,
+        help="path to a pgpulse.toml file (default: $PGPULSE_CONFIG)",
+    )
     parser.add_argument("-q", "--quiet", action="store_true", help="only show checks that need attention")
     parser.add_argument(
         "--no-color", action="store_true", help="disable colored output (NO_COLOR is honored too)"
